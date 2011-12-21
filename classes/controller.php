@@ -13,6 +13,11 @@ abstract class Controller {
 	protected $_params = array();
 
 	/**
+	 * @var   mixed  The content to render to the page
+	 */
+	protected $content = null;
+
+	/**
 	 * Do things before the action runs.
 	 */
 	public function before(){}
@@ -20,7 +25,13 @@ abstract class Controller {
 	/**
 	 * Do things after the action runs.
 	 */
-	public function after(){}
+	public function after()
+	{
+		if ($this->content !== null)
+		{
+			echo $this->content;
+		}
+	}
 
 	/**
 	 * Sets additional parameters for the controller

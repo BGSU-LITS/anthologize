@@ -42,9 +42,6 @@ class Anthologize_Wordpress
 		// Include the necessary files
 		add_action( 'anthologize_loaded', array ( "Anthologize_Wordpress", 'includes' ) );
 
-		// Send to the page router
-		add_action( 'anthologize_loaded', array('Anthologize', 'router'));
-
 		// Attach textdomain for localization
 		add_action( 'anthologize_init', array ( "Anthologize_Wordpress", 'textdomain' ) );
 
@@ -62,6 +59,83 @@ class Anthologize_Wordpress
 
 		// deactivation sequence
 		register_deactivation_hook( __FILE__, array( "Anthologize_Wordpress", 'deactivation' ) );
+	}
+
+	/**
+	 * Gets the parts associated with a project
+	 *
+	 * @package Anthologize
+	 * @since 0.3
+	 *
+	 * @param int $project_id The id for the project being loaded
+	 * @return array $parts The project's parts
+	 */
+	public static function get_project_parts($project_id = null)
+	{
+		global $post;
+	
+		if ( !$project_id ) {
+		    $project_id = $post->ID;
+		}
+	
+		$args = array(
+			'post_parent' => $project_id,
+			'post_type' => 'anth_part',
+			'posts_per_page' => -1,
+			'orderby' => 'menu_order',
+			'order' => 'ASC'
+		);
+	
+		$parts_query = new WP_Query( $args );
+	
+		if ( $parts = $parts_query->posts ) {
+			return $parts;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Gets the items associated with a project
+	 *
+	 * @package Anthologize
+	 * @since 0.3
+	 *
+	 * @param int $project_id The id for the project being loaded
+	 * @return array $items The project's items
+	 */
+	public static function get_project_items($project_id = null) {
+		global $post;
+	
+		if (!$project_id) {
+			$project_id = $post->ID;
+		}
+	
+		$parts = self::get_project_parts($project_id);
+
+		$items = array();
+		if ( $parts ) {
+			foreach ($parts as $part) {
+				$args = array(
+					'post_parent' => $part->ID,
+					'post_type' => 'anth_library_item',
+					'posts_per_page' => -1,
+					'orderby' => 'menu_order',
+					'order' => 'ASC'
+				);
+				
+				$items_query = new WP_Query( $args );
+				
+				// May need optimization
+				if ( $child_posts = $items_query->posts ) {
+					foreach( $child_posts as $child_post ) {
+						$items[] = $child_post;
+					}
+				}
+			}
+		}
+
+		return $items;
 	}
 
 	/**
