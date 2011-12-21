@@ -47,7 +47,7 @@ class Anthologize
 		$class = new $class;
 		$class->set_params(array_diff_assoc($_GET, $route)); // Setting additional route params
 
-		$action = strtolower($_SERVER['REQUEST_METHOD'])."_".$route['action'];
+		$action = "action_".strtolower($_SERVER['REQUEST_METHOD'])."_".$route['action'];
 
 		$class->before();
 		$class->$action();
@@ -108,6 +108,18 @@ class Anthologize
 
 		// Get the captured output and close the buffer
 		return ob_get_clean();
+	}
+
+	/**
+	 * Redirects to another page and exits.
+	 *
+	 * @param   string   $url    The url to redirect to
+	 * @param   int      $code   The http code
+	 */
+	public static function redirect($url, $code = 302)
+	{
+		header("Location: {$url}", true, $code);
+		exit();
 	}
 
 }
