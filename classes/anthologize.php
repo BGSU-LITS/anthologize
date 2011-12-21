@@ -4,7 +4,6 @@
  *
  * @package      Anthologize
  * @author       One Week | One Tool
- * @author       Dave Widmer <dwidmer@bgsu.edu>
  * @copyright    Copyright (C) 2010 Center for History and New Media, George Mason University
  */
 class Anthologize
