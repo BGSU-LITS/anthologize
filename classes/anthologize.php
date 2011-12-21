@@ -30,6 +30,31 @@ class Anthologize
 	}
 
 	/**
+	 * Simple page routing
+	 */
+	public static function router()
+	{
+		$defaults = array(
+			'page' => "anthologize",
+			'controller' => "project",
+			'action' => "index"
+		);
+
+		$route = array_merge($defaults, array_intersect_key($_GET, $defaults));
+
+		// Execute the request
+		$class = "Controller_{$route['controller']}";
+		$class = new $class;
+		$class->set_params(array_diff_assoc($_GET, $route)); // Setting additional route params
+
+		$action = strtolower($_SERVER['REQUEST_METHOD'])."_".$route['action'];
+
+		$class->before();
+		$class->$action();
+		$class->after();
+	}
+
+	/**
 	 * Tries to find a file contained within the plugin
 	 *
 	 * @param   string   $dir    The directory name

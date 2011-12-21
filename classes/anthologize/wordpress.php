@@ -42,6 +42,9 @@ class Anthologize_Wordpress
 		// Include the necessary files
 		add_action( 'anthologize_loaded', array ( "Anthologize_Wordpress", 'includes' ) );
 
+		// Send to the page router
+		add_action( 'anthologize_loaded', array('Anthologize', 'router'));
+
 		// Attach textdomain for localization
 		add_action( 'anthologize_init', array ( "Anthologize_Wordpress", 'textdomain' ) );
 
