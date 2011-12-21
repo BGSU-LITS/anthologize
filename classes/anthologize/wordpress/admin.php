@@ -237,31 +237,6 @@ class Anthologize_Wordpress_Admin {
 		wp_enqueue_style( 'jquery-ui-datepicker-css', WP_PLUGIN_URL . '/anthologize/css/jquery-ui-1.7.3.custom.css');
 	}
 
-	/**
-	 * Loads the project organizer when an 'edit' parameter is passed with the url
-	 *
-	 * @package Anthologize
-	 * @since 0.3
-	 *
-	 * @param int $project_id The id for the project being loaded
-	 */
-	public function load_project_organizer( $project_id ) {
-		require_once( dirname( __FILE__ ) . '/class-project-organizer.php' );
-		$project_organizer = new Anthologize_Project_Organizer( $project_id );
-		$project_organizer->display();
-
-	}
-
-	/**
-	 * Displays error markup when a project is not found by the supplied ID
-	 *
-	 * @package Anthologize
-	 * @since 0.3
-	 */
-	public function display_no_project_id_message() {
-		include Anthologize::find_file("view", "notice/no_project_id");
-	}
-
     /**
      * Deletes an item. Fun!
      */
