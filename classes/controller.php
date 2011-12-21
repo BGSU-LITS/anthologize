@@ -50,9 +50,9 @@ abstract class Controller {
 	 * @param   mixed    $default   The default value if the param isn't found
 	 * @return  mixed               The param value or the default value
 	 */
-	public function get_param($name, $default = null)
+	public function param($name, $default = null)
 	{
-		return isset($this->_param[$name]) ? $this->_param[$name] : $default;
+		return isset($this->_params[$name]) ? $this->_params[$name] : $default;
 	}
 
 }

@@ -10,14 +10,96 @@ class Controller_Project extends Controller {
 	/**
 	 * The main project screen.
 	 */
-	public function get_index()
+	public function action_get_index()
 	{
 		$this->do_project_query();
 
 		$this->content = Anthologize::render("project/home", array(
-			'project_saved' =>  $this->get_param('project_saved', FALSE) !== FALSE ? TRUE : FALSE,
-			'posts' => $this->do_project_query(),
+			'project_saved' =>  $this->param('project_saved', FALSE) !== FALSE ? TRUE : FALSE,
 		));
+	}
+
+	/**
+	 * Creates a new project
+	 */
+	public function action_get_create()
+	{
+		$this->content = Anthologize::render("project/form", array(
+			'project' => NULL,
+			'title' => __( 'Add New Project', 'anthologize' ),
+			'action' => get_admin_url() . "admin.php?page=anthologize&action=create&noheader=true"
+		));
+	}
+
+	/**
+	 * Actually create the post
+	 */
+	public function action_post_create()
+	{
+		$project = new Anthologize_Project($_POST);
+		$project->save();
+
+		wp_redirect( get_admin_url() . 'admin.php?page=anthologize&project_saved=1' );
+	}
+
+	/**
+	 * Pulls up a project to be edited.
+	 */
+	public function action_get_edit()
+	{
+		$id = $this->param('project_id', false);
+
+		if ($id === false)
+		{
+			include Anthologize::find_file("views", "notice/no_project_id");
+			return;
+		}
+
+		$this->content = Anthologize::render("project/form", array(
+			'project' => get_post($id),
+			'meta' => get_post_meta($id, 'anthologize_meta', true),
+			'title' => __( 'Edit Project', 'anthologize' ),
+			'action' => get_admin_url() . "admin.php?page=anthologize&action=edit&noheader=true&project_id=".$id
+		));
+	}
+
+	/**
+	 * Posted the edit project form.
+	 */
+	public function action_post_edit()
+	{
+		$id = $this->param('project_id', false);
+
+		if ($id === false)
+		{
+			include Anthologize::find_file("views", "notice/no_project_id");
+			return;
+		}
+
+		$project = Anthologize_Project::get($id);
+		$project->data($_POST);
+		$project->save();
+
+		Anthologize::redirect(get_admin_url().'admin.php?page=anthologize&project_saved=1');
+	}
+
+	/**
+	 * Deletes a project
+	 */
+	public function action_get_delete()
+	{
+		$id = $this->param("project_id", false);
+
+		if ($id === false)
+		{
+			include Anthologize::find_file("views", 'notice/no_project_id');
+		}
+		else
+		{
+			wp_delete_post($id);
+		}
+
+		Anthologize::redirect(get_admin_url().'admin.php?page=anthologize');
 	}
 
 /* Taken from Admin class
@@ -31,7 +113,7 @@ class Controller_Project extends Controller {
 			}
 
 			if ( $_GET['action'] == 'edit' && $project ) {
-				$this->load_project_organizer( $_GET['project_id'] );
+				
 			}
 		}
 

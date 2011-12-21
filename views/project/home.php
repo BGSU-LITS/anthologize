@@ -1,6 +1,6 @@
 <div class="wrap anthologize">
 	<div id="anthologize-logo"><img src="<?php echo WP_PLUGIN_URL . '/anthologize/images/anthologize-logo.gif' ?>" /></div>
-	<h2><?php _e( 'My Projects', 'anthologize' ) ?> <a href="admin.php?page=anthologize/includes/class-new-project.php" class="button add-new-h2"><?php _e( 'Add New', 'anthologize' ) ?></a></h2>
+	<h2><?php _e( 'My Projects', 'anthologize' ) ?> <a href="admin.php?page=anthologize&action=create" class="button add-new-h2"><?php _e( 'Add New', 'anthologize' ) ?></a></h2>
 
 <?php if ($project_saved) : ?>
 	<div id="message" class="updated fade">
@@ -8,19 +8,6 @@
 	</div>
 <?php endif; ?>
 
-
-		<?php
-/*
-
-		if ( !empty( $_GET['action'] ) && $_GET['action'] == 'edit' && !isset( $_GET['project_id'] ) || isset( $_GET['project_id'] ) && !$project ) {
-			$this->display_no_project_id_message();
-		}
-
-		$this->do_project_query();
- * 
- */
-?>
-	
 <?php if (have_posts()): ?>
 	<div class="tablenav">
 		<div class="tablenav-pages">
@@ -62,7 +49,7 @@
 					$controlActions	= array();
 					$controlActions[]	= '<a href="admin.php?page=anthologize&action=edit&project_id=' . get_the_ID() .'">' . __('Project Details', 'anthologize') . '</a>';
 					$controlActions[]   = '<a href="admin.php?page=anthologize&action=edit&project_id=' . get_the_ID() .'">'.__('Manage Parts', 'anthologize') . '</a>';
-					$controlActions[]   = '<a href="admin.php?page=anthologize&action=delete&project_id=' . get_the_ID() .'" class="confirm-delete">'.__('Delete Project', 'anthologize') . '</a>';
+					$controlActions[]   = '<a href="admin.php?page=anthologize&action=delete&noheader=true&project_id=' . get_the_ID() .'" class="confirm-delete">'.__('Delete Project', 'anthologize') . '</a>';
 					?>
 
 					<?php if (count($controlActions)) : ?>
