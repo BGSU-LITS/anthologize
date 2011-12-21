@@ -1,10 +1,12 @@
-<?php
-
-if ( !class_exists( 'Anthologize_Ajax_Handlers' ) ) :
-
-    require_once('class-project-organizer.php');
-
-class Anthologize_Ajax_Handlers {
+<?php defined("ANTHOLOGIZE") or die("No direct script access.");
+/**
+ * Ajax handlers for Wordpress.
+ *
+ * @package      Anthologize
+ * @author       One Week | One Tool
+ * @copyright    Copyright (C) 2010 Center for History and New Media, George Mason University
+ */
+class Anthologize_Wordpress_Ajax_Handlers {
 
     var $project_organizer = null;
 
@@ -24,7 +26,7 @@ class Anthologize_Ajax_Handlers {
         $this->anthologize_ajax_handlers();
         $project_id = ( isset( $_POST['project_id'] ) ) ? $_POST['project_id'] : 0;
                 
-        $this->project_organizer = new Anthologize_Project_Organizer($project_id);
+        $this->project_organizer = new Anthologize_Wordpress_Project_Organizer($project_id);
        
     }
 
@@ -441,7 +443,3 @@ class Anthologize_Ajax_Handlers {
 		die();
 	}
 }
-
-endif;
-
-?>

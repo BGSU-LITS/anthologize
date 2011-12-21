@@ -50,4 +50,39 @@ class Anthologize
 		return $found;
 	}
 
+	/**
+	 * A simple view rendering function.
+	 *
+	 * Taken from the Kohana Framework.
+	 *
+	 * @param   string  $view    The view file to render
+	 * @param   array   $data    Data to include in the view
+	 * @return  string           Rendered output
+	 */
+	public static function render($view, array $data = array())
+	{
+		// Import the view variables to local namespace
+		extract($data, EXTR_SKIP);
+
+		// Capture the view output
+		ob_start();
+
+		try
+		{
+			// Load the view within the current scope
+			include Anthologize::find_file("views", $view);
+		}
+		catch (Exception $e)
+		{
+			// Delete the output buffer
+			ob_end_clean();
+
+			// Re-throw the exception
+			throw $e;
+		}
+
+		// Get the captured output and close the buffer
+		return ob_get_clean();
+	}
+
 }

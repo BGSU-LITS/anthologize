@@ -1,21 +1,26 @@
-<?php
-
-
-if ( !class_exists( 'Anthologize_Admin_Main' ) ) :
-
-class Anthologize_Admin_Main {
-	var $minimum_cap;
+<?php defined("ANTHOLOGIZE") or die("No direct script access.");
+/**
+ * Anthologize Administration in Wordpress
+ *
+ * @package      Anthologize
+ * @author       One Week | One Tool
+ * @copyright    Copyright (C) 2010 Center for History and New Media, George Mason University
+ */
+class Anthologize_Wordpress_Admin {
+	/**
+	 * @var   string   The minimum level for the user to access the pages.
+	 */
+	protected $minimum_cap = null;
 
 	/**
-	 * List all my projects. Pretty please
+	 * Setup the admin interface
 	 */
-	function anthologize_admin_main () {
+	public function __construct()
+	{
 		$this->minimum_cap = $this->minimum_cap();
-		
+
 		add_action( 'admin_init', array ( $this, 'init' ) );
-
 		add_action( 'admin_menu', array( $this, 'dashboard_hooks' ), 990 );
-
 		add_action( 'admin_notices', array( $this, 'version_nag' ) );
 		
 		if ( is_multisite() ) {
@@ -24,15 +29,18 @@ class Anthologize_Admin_Main {
 		}
 	}
 
-	function init() {
+	/**
+	 * Initilization function for the admin panel
+	 */
+	public function init() {
 		foreach ( array('anth_project', 'anth_part', 'anth_library_item', 'anth_imported_item') as $type ) {
 			add_meta_box('anthologize', __( 'Anthologize', 'anthologize' ), array($this,'item_meta_box'), $type, 'side', 'high');
 			add_meta_box('anthologize-save', __( 'Save', 'anthologize' ), array($this,'meta_save_box'), $type, 'side', 'high');
 			remove_meta_box( 'submitdiv' , $type , 'normal' );
 		}
-		
+
 		add_action('save_post',array( $this, 'item_meta_save' ));
-		
+
 		do_action( 'anthologize_admin_init' );
 	}
 
@@ -47,10 +55,15 @@ class Anthologize_Admin_Main {
 	 *
 	 * @package Anthologize
 	 * @since 0.6
+	 * @return   mixed    The minimum cap for user actions.
 	 */
-	function minimum_cap() {
+	public function minimum_cap() {
+		if ($this->minimum_cap !== null)
+		{
+			return $this->minimum_cap;
+		}
+
 		// If the super admin hasn't set a default, it'll fall back to manage_options, i.e. Administrators-only
-		
 		// Get the default cap
 		if ( is_multisite() ) {
 			$site_settings = get_site_option( 'anth_site_settings' );
@@ -59,7 +72,7 @@ class Anthologize_Admin_Main {
 		} else {
 			$default_cap = 'manage_options';
 		}
-		
+
 		// Then use the default to set the minimum cap for this blog
 		if ( !is_multisite() || empty( $site_settings['forbid_per_blog_caps'] ) ) {
 			$blog_settings = get_option( 'anth_settings' );
@@ -67,7 +80,7 @@ class Anthologize_Admin_Main {
 		} else {
 			$cap = $default_cap; 
 		}
-		
+
 		return apply_filters( 'anth_minimum_cap', $cap );
 	}
 
@@ -79,7 +92,7 @@ class Anthologize_Admin_Main {
 	 * @package Anthologize
 	 * @since 0.3
 	 */
-	function dashboard_hooks() {
+	public function dashboard_hooks() {
 		global $menu;
 		
 		// The default location of the Anthologize menu item. Anthologize needs an empty
@@ -130,8 +143,10 @@ class Anthologize_Admin_Main {
 
 	}
 
-	// Borrowed, with much love, from BuddyPress. Allows us to put Anthologize way up top.
-	function add_admin_menu_page( $args = '' ) {
+	/**
+	 * Borrowed, with much love, from BuddyPress. Allows us to put Anthologize way up top.
+	 */
+	public function add_admin_menu_page( $args = '' ) {
 		global $menu, $admin_page_hooks, $_registered_pages;
 
 		$defaults = array(
@@ -180,7 +195,7 @@ class Anthologize_Admin_Main {
 	 * @package Anthologize
 	 * @since 0.3
 	 */
-	function load_scripts() {
+	public function load_scripts() {
 		wp_enqueue_script( 'anthologize-js', WP_PLUGIN_URL . '/anthologize/js/project-organizer.js' );
 		wp_enqueue_script( 'jquery');
 		wp_enqueue_script( 'jquery-ui-core');
@@ -221,7 +236,7 @@ class Anthologize_Admin_Main {
 	 * @package Anthologize
 	 * @since 0.3
 	 */
-	function load_styles() {
+	public function load_styles() {
 		wp_enqueue_style( 'anthologize-css', WP_PLUGIN_URL . '/anthologize/css/project-organizer.css' );
 		wp_enqueue_style( 'jquery-ui-datepicker-css', WP_PLUGIN_URL . '/anthologize/css/jquery-ui-1.7.3.custom.css');
 	}
@@ -234,7 +249,7 @@ class Anthologize_Admin_Main {
 	 *
 	 * @param int $project_id The id for the project being loaded
 	 */
-	function load_project_organizer( $project_id ) {
+	public function load_project_organizer( $project_id ) {
 		require_once( dirname( __FILE__ ) . '/class-project-organizer.php' );
 		$project_organizer = new Anthologize_Project_Organizer( $project_id );
 		$project_organizer->display();
@@ -247,12 +262,8 @@ class Anthologize_Admin_Main {
 	 * @package Anthologize
 	 * @since 0.3
 	 */
-	function display_no_project_id_message() {
-		?>
-			<div id="notice" class="error below-h2">
-				<p><?php _e( 'Project not found', 'anthologize' ) ?></p>
-			</div>
-		<?php
+	public function display_no_project_id_message() {
+		include Anthologize::find_file("view", "notice/no_project_id");
 	}
 
 	/**
@@ -264,7 +275,7 @@ class Anthologize_Admin_Main {
 	 * @param int $project_id The id for the project being loaded
 	 * @return array $parts The project's parts
 	 */
-    	function get_project_parts( $project_id = null ) {
+    public function get_project_parts( $project_id = null ) {
 		global $post;
 	
 		if ( !$project_id ) {
@@ -297,7 +308,7 @@ class Anthologize_Admin_Main {
 	 * @param int $project_id The id for the project being loaded
 	 * @return array $items The project's items
 	 */
-	function get_project_items($project_id = null) {
+	public function get_project_items($project_id = null) {
 		global $post;
 	
 		if (!$project_id) {
@@ -337,7 +348,7 @@ class Anthologize_Admin_Main {
 	 * @package Anthologize
 	 * @since 0.3
 	 */
-	function display() {
+	public function display() {
 		if ( isset( $_GET['project_id'] ) )
 			$project = get_post( $_GET['project_id'] );
 
@@ -497,7 +508,7 @@ class Anthologize_Admin_Main {
 	 * @package Anthologize
 	 * @since 0.3
 	 */
-	function do_project_query() {
+	public function do_project_query() {
 		global $current_user;
 		
 		// Set up the default arguments
@@ -515,53 +526,30 @@ class Anthologize_Admin_Main {
 	}
 
     /**
-     * item_delete
-     *
      * Deletes an item. Fun!
-     **/
-     function item_delete($post_id)
+     */
+     public function item_delete($post_id)
      {
 
      }
 
+	/**
+	 * The Save box display
+	 *
+	 * @param  int  $post_id  The post id
+	 */ 
 	function meta_save_box( $post_id ) {
-		?>
-	<div class="inside">
-		<div class="submitbox" id="submitpost">
-
-			<div id="minor-publishing">
-
-				<div style="display:none;">
-					<input type="submit" name="save" value="Save">
-				</div>
-
-				<div id="minor-publishing-actions">
-					<div id="save-action">
-					<input type="submit" name="save" id="save-post" value="<?php _e( 'Save Changes', 'anthologize' ) ?>" tabindex="4" class="button button-highlighted">
-					</div>
-
-				</div>
-
-				<div id="major-publishing-actions">
-
-				</div>
-			</div>
-		</div>
-	</div>
-
-		<?php
+		Anthologize::render('meta/save_box', array('post_id' => $post_id));
 	}
 
-
-
 	/**
-	* item_meta_save
-	*
-	* Processes post save from the item_meta_box function. Saves
-	* custom post metadata. Also responsible for correctly
-	* redirecting to Anthologize pages after saving.
-	**/
-	function item_meta_save( $post_id ) {
+	 * item_meta_save
+	 *
+	 * Processes post save from the item_meta_box function. Saves
+	 * custom post metadata. Also responsible for correctly
+	 * redirecting to Anthologize pages after saving.
+	 */
+	public function item_meta_save( $post_id ) {
 		// make sure data came from our meta box. Only save when nonce is present
 		if ( empty( $_POST['anthologize_noncename'] ) || !wp_verify_nonce( $_POST['anthologize_noncename'],__FILE__ ) )
 			return $post_id;
@@ -598,7 +586,7 @@ class Anthologize_Admin_Main {
 	 * @param str $location
 	 * @retur str $location
 	 */
-    	function item_meta_redirect($location) {
+	public function item_meta_redirect($location) {
     		if ( isset( $_POST['post_parent'] ) ) {
     			$post_parent_id = $_POST['post_parent'];
     		} else {
@@ -642,73 +630,11 @@ class Anthologize_Admin_Main {
 
         global $post;
 
-        $meta = get_post_meta( $post->ID, 'anthologize_meta', TRUE );
-        $imported_item_meta = get_post_meta( $post->ID, 'imported_item_meta', true );
-       	$author_name = get_post_meta( $post->ID, 'author_name', true );
-
-        ?>
-        <div class="my_meta_control">
-
-        	<label>Author Name <span>(optional)</span></label>
-
-        	<p>
-        		<textarea class="tags-input" name="anthologize_meta[author_name]" rows="3" cols="27"><?php echo $author_name ?></textarea>
-        	</p>
-
-        	<?php /* Display content for imported feed, if there is any */ ?>
-        	<?php if ( $imported_item_meta ) : ?>
-        		<dl>
-        		<?php foreach ( $imported_item_meta as $key => $value ) : ?>
-        			<?php
-        				$the_array = array( 'feed_title', 'link', 'created_date' );
-        				if ( !in_array( $key, $the_array ) )
-        					continue;
-
-						switch ( $key ) {
-							case 'feed_title':
-								$dt = __( 'Source feed:', 'anthologize' );
-								$dd = '<a href="' . $imported_item_meta['feed_permalink'] . '">' . $value . '</a>';
-								break;
-							case 'link':
-								$dt = __( 'Source URL:', 'anthologize' );
-								$dd = '<a href="' . $value . '">' . $value . '</a>';
-								break;
-							/*case 'authors':
-								$dt = __( 'Author:', 'anthologize' );
-								$ddv = $value[0];
-								$dd = $ddv->name;
-								break; todo: fixme */
-							case 'created_date':
-								$dt = __( 'Date created:', 'anthologize' );
-								$dd = $value;
-								break;
-							default:
-								continue;
-								break;
-						}
-        			?>
-
-
-        			<dt><?php echo $dt ?></dt>
-        			<dd><?php echo $dd ?></dd>
-        		<?php endforeach; ?>
-        		</dl>
-
-        	<?php endif; ?>
-
-		<?php if ( isset( $_GET['return_to_project'] ) ) : ?>
-			<input type="hidden" name="return_to_project" value="<?php echo $_GET['return_to_project'] ?>" />
-		<?php endif; ?>
-
-		<?php if ( isset( $_GET['new_part'] ) ) : ?>
-			<input type="hidden" id="new_part" name="new_part" value="1" />
-                	<input type="hidden" id="anth_parent_id" name="parent_id" value="<?php echo $_GET['project_id']; ?>" />
-		<?php endif; ?>
-		
-		<input type="hidden" id="menu_order" name="menu_order" value="<?php echo $post->menu_order; ?>">
-		<input class="tags-input" type="hidden" id="anthologize_noncename" name="anthologize_noncename" value="<?php echo wp_create_nonce(__FILE__); ?>" />
-        </div>
-    <?php
+		Anthologize::render("meta/edit", array(
+			'meta' => get_post_meta( $post->ID, 'anthologize_meta', TRUE ),
+			'imported_item_meta' => get_post_meta( $post->ID, 'imported_item_meta', true ),
+			'author_name' => get_post_meta( $post->ID, 'author_name', true )
+		));
     }
 
 
@@ -722,7 +648,7 @@ class Anthologize_Admin_Main {
 	 * @param int $user_id Optional The user to check. Defaults to logged-in user
 	 * @return bool $user_can_edit Returns true when the user can edit, false if not
 	 */
-	function user_can_edit( $post_id = false, $user_id = false ) {
+	public function user_can_edit( $post_id = false, $user_id = false ) {
 		global $post, $current_user;
 		
 		$user_can_edit = false;
@@ -746,19 +672,20 @@ class Anthologize_Admin_Main {
 		
 		return apply_filters( 'anth_user_can_edit', $user_can_edit, $post_id, $user_id );
 	}
-	
+
+	/**
+	 * Displays a message to let the user know that the version of wordpress isn't compatible.
+	 *
+	 * @global type $wp_version 
+	 */
 	function version_nag() {
 		global $wp_version;
 
-		?>
-
-		<?php if ( version_compare( $wp_version, '3.0', '<' ) ) : ?>
-		<div id="message" class="updated fade">
-			<p style="line-height: 150%"><?php printf( __( "<strong>Anthologize will not work with your version of WordPress</strong>. You are currently running version WordPress v%s, and Anthologize requires version 3.0 or greater. Please upgrade WordPress if you'd like to use Anthologize. ", 'buddypress' ), $wp_version ) ?></p>
-		</div>
-		<?php endif; ?>
-
-		<?php
+		if ( version_compare( $wp_version, '3.0', '<' ) ){
+			Anthologize::render("notice/wordpress_nag", array(
+				'version' => $wp_version
+			));
+		}
 	}
 	
 	/**
@@ -767,63 +694,12 @@ class Anthologize_Admin_Main {
 	 * @package Anthologize
 	 * @since 0.6
 	 */
-	function ms_settings() {
-		
+	public function ms_settings() {
 		$site_settings = get_site_option( 'anth_site_settings' );
-		
-		$minimum_cap = !empty( $site_settings['minimum_cap'] ) ? $site_settings['minimum_cap'] : 'manage_options';
-		
-		?>
-		
-		<h3><?php _e( 'Anthologize', 'anthologize' ); ?></h3>
-		
-		<table id="menu" class="form-table">
-			<tr valign="top">
-				<th scope="row"><?php _e( 'Allow individual site admins to determine which kinds of users can use Anthologize?', 'anthologize' ); ?></th>
-				<td>
-				
-				<?php 
-				/**
-				 * This value is called 'forbid_per_blog_caps' but is worded in
-				 * terms of 'allowing'. This is because I wanted the wording to be
-				 * in terms of allowing (so that checked = allowed) but for the
-				 * default value to be allowed, without needing to initialize
-				 * options in the installer.
-				 */
-				?>
-				<label><input type="checkbox" class="tags-input" name="anth_site_settings[forbid_per_blog_caps]" value="1" <?php if ( empty( $site_settings['forbid_per_blog_caps'] ) ) : ?>checked="checked"<?php endif ?>> <?php _e( 'When unchecked, access to Anthologize will be limited to the default role you select below.', 'anthologize' ) ?></label>
-			
-				</td>
-			</tr>
-			
-			<tr valign="top">
-				<th scope="row"><?php _e( 'Default mimimum role for Anthologizers', 'anthologize' ); ?></th>
-				<td>
-				
-				<label>
-					<select class="tags-input" name="anth_site_settings[minimum_cap]">
-						<option<?php selected( $minimum_cap, 'manage_network' ) ?> value="manage_network"><?php _e( 'Network Admin', 'anthologize' ) ?></option>
-				
-						<option<?php selected( $minimum_cap, 'manage_options' ) ?> value="manage_options"><?php _e( 'Administrator', 'anthologize' ) ?></option>
-					
-						<option<?php selected( $minimum_cap, 'delete_others_posts' ) ?> value="delete_others_posts"><?php _e( 'Editor', 'anthologize' ) ?></option>
-					
-						<option<?php selected( $minimum_cap, 'publish_posts' ) ?> value="publish_posts"><?php _e( 'Author', 'anthologize' ) ?></option>
-					
-						<?php /* Removing these for now */ ?>
-						<?php /*
-						<option<?php selected( $minimum_cap, 'edit_posts' ) ?> value="edit_posts"><?php _e( 'Contributor', 'anthologize' ) ?></option>
-					
-						<option<?php selected( $minimum_cap, 'read' ) ?> value="read"><?php _e( 'Subscriber', 'anthologize' ) ?></option>
-						*/ ?>
-					</select>
-				</label>
-			
-				</td>
-			</tr>
-		</table>
-		
-		<?php
+
+		Anthologize::render("multisite/settings", array(
+			'minimum_cap' => ! empty( $site_settings['minimum_cap'] ) ? $site_settings['minimum_cap'] : 'manage_options',
+		));		
 	}
 	
 	/**
@@ -832,7 +708,7 @@ class Anthologize_Admin_Main {
 	 * @package Anthologize
 	 * @since 0.6
 	 */
-	function save_ms_settings() {
+	public function save_ms_settings() {
 		$forbid_per_blog_caps = empty( $_POST['anth_site_settings']['forbid_per_blog_caps'] ) ? 1 : 0;
 		$minimum_cap = empty( $_POST['anth_site_settings']['minimum_cap'] ) ? 'manage_options' : $_POST['anth_site_settings']['minimum_cap'];
 		
@@ -845,10 +721,3 @@ class Anthologize_Admin_Main {
 		update_site_option( 'anth_site_settings', $anth_site_settings );
 	}
 }
-
-endif;
-
-$anthologize_admin_main = new Anthologize_Admin_Main();
-
-
-?>

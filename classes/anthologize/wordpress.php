@@ -349,9 +349,8 @@ class Anthologize_Wordpress
 	public function includes() {
 
 		if ( is_admin() ) {
-			include Anthologize::find_file('includes', 'class-admin-main');
-			include Anthologize::find_file('includes', 'class-ajax-handlers');
-			$ajax_handlers = new Anthologize_Ajax_Handlers();
+			$admin = new Anthologize_Wordpress_Admin;
+			//$ajax_handlers = new Anthologize_Wordpress_Ajax_Handlers;
 		}
 
 		require_once Anthologize::find_file('includes', 'class-format-api');

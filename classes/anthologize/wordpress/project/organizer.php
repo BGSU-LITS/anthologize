@@ -1,8 +1,12 @@
-<?php
-
-if ( !class_exists( 'Anthologize_Project_Organizer' ) ) :
-
-class Anthologize_Project_Organizer {
+<?php defined("ANTHOLOGIZE") or die("No direct script access.");
+/**
+ * Project Organization for Wordpress.
+ *
+ * @package      Anthologize
+ * @author       One Week | One Tool
+ * @copyright    Copyright (C) 2010 Center for History and New Media, George Mason University
+ */
+class Anthologize_Wordpress_Project_Organizer {
 
 	var $project_id;
 
@@ -803,7 +807,3 @@ class Anthologize_Project_Organizer {
 		return $url;
 	}
 }
-
-endif;
-
-?>
