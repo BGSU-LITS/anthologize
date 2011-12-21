@@ -22,44 +22,44 @@ class Anthologize_Wordpress
 
 		// If the PHP version is less than 5, print a message and stop the plugin from loading
 		if (version_compare( phpversion(), '5', '<' )) {
-			add_action('admin_notices', array($this, 'phpversion_nag'));
+			add_action('admin_notices', array("Anthologize_Wordpress", 'phpversion_nag'));
 			return;
 		}
 
 		// Give me something to believe in
-		add_action( 'plugins_loaded', array ( $this, 'loaded' ) );
+		add_action( 'plugins_loaded', array ( "Anthologize_Wordpress", 'loaded' ) );
 
-		add_action( 'init', array ( $this, 'init' ) );
+		add_action( 'init', array ( "Anthologize_Wordpress", 'init' ) );
 
 		// Load the post types
-		add_action( 'anthologize_init', array ( $this, 'register_post_types' ) );
+		add_action( 'anthologize_init', array ( "Anthologize_Wordpress", 'register_post_types' ) );
 
 		// Load constants
-		add_action( 'anthologize_init',  array ( $this, 'load_constants' ) );
+		add_action( 'anthologize_init',  array ( "Anthologize_Wordpress", 'load_constants' ) );
 
 		// Load the custom feed
-		add_action( 'do_feed_customfeed', array ( $this, 'register_custom_feed' ) );
+		add_action( 'do_feed_customfeed', array ( "Anthologize_Wordpress", 'register_custom_feed' ) );
 
 		// Include the necessary files
-		add_action( 'anthologize_loaded', array ( $this, 'includes' ) );
+		add_action( 'anthologize_loaded', array ( "Anthologize_Wordpress", 'includes' ) );
 
 		// Attach textdomain for localization
-		add_action( 'anthologize_init', array ( $this, 'textdomain' ) );
+		add_action( 'anthologize_init', array ( "Anthologize_Wordpress", 'textdomain' ) );
 
-		add_action( 'anthologize_init', array ( $this, 'load_template' ), 999 );
+		add_action( 'anthologize_init', array ( "Anthologize_Wordpress", 'load_template' ), 999 );
 
 		// Register the built-in export formats
-		add_action( 'anthologize_init', array( $this, 'default_export_formats' ) );
+		add_action( 'anthologize_init', array( "Anthologize_Wordpress", 'default_export_formats' ) );
 
-		add_filter( 'custom_menu_order', array( $this, 'custom_menu_order_function' ) );
+		add_filter( 'custom_menu_order', array( "Anthologize_Wordpress", 'custom_menu_order_function' ) );
 
-		add_filter( 'menu_order', array( $this, 'menu_order_my_function' ) );
+		add_filter( 'menu_order', array( "Anthologize_Wordpress", 'menu_order_my_function' ) );
 
 		// activation sequence
-		register_activation_hook( __FILE__, array( $this, 'activation' ) );
+		register_activation_hook( __FILE__, array( "Anthologize_Wordpress", 'activation' ) );
 
 		// deactivation sequence
-		register_deactivation_hook( __FILE__, array( $this, 'deactivation' ) );
+		register_deactivation_hook( __FILE__, array( "Anthologize_Wordpress", 'deactivation' ) );
 	}
 
 	/**
@@ -350,7 +350,7 @@ class Anthologize_Wordpress
 	public function includes() {
 
 		if ( is_admin() ) {
-			include Anthologize::find_file('includes', 'class-admin-admin');
+			include Anthologize::find_file('includes', 'class-admin-main');
 			include Anthologize::find_file('includes', 'class-ajax-handlers');
 			$ajax_handlers = new Anthologize_Ajax_Handlers();
 		}
