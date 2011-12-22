@@ -23,147 +23,6 @@ class Anthologize_Wordpress_Project_Organizer {
 
 	}
 
-	function display() {
-
-		if ( isset( $_POST['new_item'] ) )
-			$this->add_item_to_part( $_POST['item_id'], $_POST['part_id'] );
-
-		if ( isset( $_POST['new_part'] ) )
-			$this->add_new_part( $_POST['new_part_name'] );
-
-		if ( isset( $_GET['move_up'] ) )
-			$this->move_up( $_GET['move_up'] );
-
-		if ( isset( $_GET['move_down'] ) )
-			$this->move_down( $_GET['move_down'] );
-
-		if ( isset( $_GET['remove'] ) )
-			$this->remove_item( $_GET['remove'] );
-
-		if ( isset( $_POST['append_children'] ) ) {
-			$this->append_children( $_POST['append_parent'], $_POST['append_children'] );
-		}
-
-		?>
-		<div class="wrap anthologize" id="project-<?php echo $_GET['project_id'] ?>">
-
-        <div id="blockUISpinner">
-            <img src="<?php echo WP_PLUGIN_URL ?>/anthologize/images/wait28.gif"</img>
-            <p id="ajaxErrorMsg"><?php _e('There has been an unexpected error. Please wait while we reload the content.', 'anthologize') ?></p>
-        </div>
-
-		<div id="anthologize-logo"><img src="<?php echo WP_PLUGIN_URL . '/anthologize/images/anthologize-logo.gif' ?>" /></div>
-
-		<h2><?php echo $this->project_name ?>
-
-		<div id="project-actions">
-			<a href="admin.php?page=anthologize/includes/class-new-project.php&project_id=<?php echo $this->project_id ?>"><?php _e( 'Project Details', 'anthologize' ) ?></a> |
-			<a target="_blank" href="<?php echo $this->preview_url( $this->project_id, 'anth_project' ) ?>"><?php _e( 'Preview Project', 'anthologize' ) ?></a> |
-			<a href="admin.php?page=anthologize&action=delete&project_id=<?php echo $this->project_id ?>" class="confirm-delete"><?php _e( 'Delete Project', 'anthologize' ) ?></a>
-		</div>
-
-		</h2>
-
-		<?php if ( isset( $_GET['append_parent'] ) && !isset( $_GET['append_children'] ) ) : ?>
-			<div id="message" class="updated below-h2">
-				<p><?php _e( 'Select the items you would like to append and click Go.', 'anthologize' ) ?></p>
-			</div>
-		<?php endif; ?>
-
-		<div id="project-organizer-frame">
-			<div id="project-organizer-left-column" class="metabox-holder">
-				<div id="side-sortables" class="meta-box-sortables ui-sortable">
-
-				<div id="add-custom-links" class="postbox ">
-				<div class="handlediv" title="<?php _e( 'Click to toggle', 'anthologize' ) ?>"><br></div><h3 class="hndle"><span><?php _e( 'Items', 'anthologize' ) ?></span></h3>
-				<div class="inside">
-					<div class="customlinkdiv" id="customlinkdiv">
-
-							<p id="menu-item-name-wrap">
-								<?php $this->sortby_dropdown() ?>
-							</p>
-
-							<p id="termfilter">
-								<?php $this->filter_dropdown() ?>
-							</p>
-							<p id="datefilter">
-								<?php $this->filter_date(); ?>
-							</p>
-
-							<h3 class="part-header"><?php _e( 'Posts', 'anthologize' ) ?></h3>
-							<div id="posts-scrollbox">
-
-								<?php $this->get_sidebar_posts() ?>
-
-							</div>
-
-					</div><!-- /.customlinkdiv -->
-					</div>
-				</div> <!-- /.postbox -->
-
-				</div> <!-- .meta-box-sortables -->
-			</div> <!-- .project-organizer-left-column -->
-
-			<div class="metabox-holder" id="project-organizer-right-column">
-
-				<div class="postbox" id="anthologize-parts-box">
-
-				<div class="handlediv" title="<?php _e( 'Click to toggle', 'anthologize' ) ?>"><br></div><h3 class="hndle"><span><?php _e( 'Parts', 'anthologize' ) ?></span><div class="part-item-buttons button" id="new-part"><a href="post-new.php?post_type=anth_part&project_id=<?php echo $this->project_id ?>&new_part=1"><?php _e( 'New Part', 'anthologize' ) ?></a></div></h3>
-
-				<div id="partlist">
-
-				<ul class="project-parts">
-                	<?php $this->list_existing_parts() ?>
-                </ul>
-
-				<noscript>
-					<h3><?php _e( 'New Parts', 'anthologize' ) ?></h3>
-					<p><?php _e( 'Wanna create a new part? You know you do.', 'anthologize' ) ?></p>
-					<form action="" method="post">
-						<input type="text" name="new_part_name" />
-						<input type="submit" name="new_part" value="New Part" />
-					</form>
-				</noscript>
-
-				<!--
-					<br /><br />
-					<p>See the *actual* project at <a href="http://mynameinklingon.org">mynameinklingon.org</a>. You lucky duck.</p>
-				-->
-
-				</div>
-
-				</div> <!-- #anthologize-part-box -->
-
-			<div class="button" id="export-project-button"><a href="admin.php?page=anthologize/includes/class-export-panel.php&project_id=<?php echo $this->project_id ?>" id="export-project"><?php _e( 'Export Project', 'anthologize' ) ?></a></div>
-
-			</div> <!-- #project-organizer-right-column -->
-
-
-		</div> <!-- #project-organizer-frame -->
-
-		</div> <!-- .wrap -->
-		<?php
-
-	}
-
-	function sortby_dropdown() {
-		$filters = array( 
-			'tag' => __( 'Tag', 'anthologize' ), 
-			'category' => __( 'Category', 'anthologize' ),
-			'date' => __( 'Date Range', 'anthologize' ),
-			'post_type' => __( 'Post Type', 'anthologize' )
-		);
-		$cfilter = isset( $_COOKIE['anth-filter'] ) ? $_COOKIE['anth-filter'] : '';
-		?>
-            <span><?php _e( 'Filter by', 'anthologize' ) ?></span>
-			<select name="sortby" id="sortby-dropdown">
-				<option value="" selected="selected"><?php _e( 'All posts', 'anthologize' ) ?></option>
-				<?php foreach( $filters as $filter => $name ) : ?>
-					<option value="<?php echo $filter ?>" <?php if ( $filter == $cfilter ) : ?>selected="selected"<?php endif; ?>><?php echo $name ?></option>
-				<?php endforeach; ?>
-			</select>
-		<?php
-	}
 
 	function filter_dropdown() {
 
@@ -203,13 +62,7 @@ class Anthologize_Wordpress_Project_Organizer {
 
 		?>
 			
-			<select name="filter" id="filter">
-				<option value=""><?php echo $nulltext; ?></option>
-				<?php foreach( $terms as $term ) : ?>
-					<?php $term_value = ( $_COOKIE['anth-filter'] == 'tag' ) ? $term->slug : $term->term_id; ?>
-					<option value="<?php echo $term_value ?>" <?php if ( $cterm == $term_value ) : ?>selected="selected"<?php endif; ?>><?php echo $term->name ?></option>
-				<?php endforeach; ?>
-			</select>
+			
 			
 		<?php
 	}
@@ -217,43 +70,11 @@ class Anthologize_Wordpress_Project_Organizer {
 	function filter_date(){
 		?>
 		
-		<label for="startdate">Start</label> <input name="starddate" id="startdate" type="text"/>
-		<br />
-		<label for="enddate">End</label> <input name="enddate" id="enddate" type="text" />
-		<br />
-		<input type="button" id="launch_date_filter" value="Filter" /> 
+
 		<?php
 	}
 	
-	/**
-	 * Provide a list of post types available as a filter on the project organizer screen.
-	 *
-	 * @package Anthologize
-	 * @subpackage Project Organizer
-	 * @since 0.5
-	 *
-	 * @return array A list of post type labels, keyed by name
-	 */
-	function available_post_types() {
-		$all_post_types = get_post_types( false, false );
-		
-		$excluded_post_types = apply_filters( 'anth_excluded_post_types', array(
-			'anth_library_item',
-			'anth_part',
-			'anth_project',
-			'attachment',
-			'revision',
-			'nav_menu_item'
-		) );
-		
-		$types = array();
-		foreach( $all_post_types as $name => $post_type ) {
-			if ( !in_array( $name, $excluded_post_types ) )
-				$types[$name] = isset( $post_type->labels->name ) ? $post_type->labels->name : $name;
-		}
-				
-		return apply_filters( 'anth_available_post_types', $types );		
-	}
+	
 
 	function add_item_to_part( $item_id, $part_id ) {
 		global $wpdb, $current_user;
@@ -350,154 +171,7 @@ class Anthologize_Wordpress_Project_Organizer {
 		return true;
 	}
 
-	function list_existing_parts() {
-
-		$args = array(
-			'post_type' => 'anth_part',
-			'order' => 'ASC',
-			'orderby' => 'menu_order',
-			'post_per_page' => -1,
-			'showposts' => -1,
-			'post_parent' => $this->project_id
-		);
-
-		query_posts( $args );
-
-		if ( have_posts() ) {
-			while ( have_posts() ) {
-				the_post();
-
-				$part_id = get_the_ID();
-
-				?>
-
-				<!--// <form action="" method="post"> //-->
-
-				<?php
-
-				?>
-					<li class="part" id="part-<?php echo $part_id ?>">
-						<h3 class="part-header"><noscript><a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $this->project_id ?>&move_up=<?php echo $part_id ?>">&uarr;</a> <a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $this->project_id ?>&move_down=<?php echo $part_id ?>">&darr;</a> </noscript>
-						<span class="part-title-header"><?php the_title() ?></span>
-
-						<div class="part-buttons">
-							<a href="post.php?post=<?php the_ID() ?>&action=edit&return_to_project=<?php echo $this->project_id ?>"><?php _e( 'Edit', 'anthologize' ) ?></a> |
-							
-							<a target="_blank" href="<?php echo $this->preview_url( get_the_ID(), 'anth_part' ) ?>" class=""><?php _e( 'Preview', 'anthologize' ) ?></a> |
-							
-							<a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $this->project_id ?>&remove=<?php the_ID() ?>" class="remove"><?php _e( 'Remove', 'anthologize' ) ?></a> |
-							<a href="#collapse" class="collapsepart"> - </a> 
-						</div>
-
-						</h3>
-
-						<div class="part-items">
-                        	<ul>
-								<?php $this->get_part_items( $part_id ) ?>
-                            </ul>
-						</div>
-
-						<?php /* Noscript solution. Removed at the moment to avoid db queries. Todo: refactor ?>
-							<?php if ( isset( $_GET['append_parent'] ) && !isset( $_GET['append_children'] ) ) : ?>
-
-								<input type="submit" name="append_submit" value="Go" />
-								<input type="hidden" name="append_parent" value="<?php echo $_GET['append_parent']  ?>" />
-
-							<?php else : ?>
-
-								<select name="item_id">
-									<?php $this->get_posts_as_option_list( $part_id ) ?>
-								</select>
-								<input type="submit" name="new_item" value="Add Item" />
-								<input type="hidden" name="part_id" value="<?php echo $part_id ?>" />
-
-							<?php endif; ?>
-
-						<?php */ ?>
-
-					</li>
-
-
-				<!--// </form> //-->
-				<?php
-			}
-		} else {
-		?>
-			<p><?php echo sprintf( __( 'You haven\'t created any parts yet! Click <a href="%1$s">"New Part"</a> to get started.', 'anthologize' ), 'post-new.php?post_type=anth_part&project_id=' . $this->project_id . '&new_part=1' ) ?></p>
-		<?php
-		}
-
-
-
-		wp_reset_query();
-	}
-
-	function get_sidebar_posts() {
-		global $wpdb;
-
-		$args = array(
-			'post_type' => array('post', 'page', 'anth_imported_item' ),
-			'posts_per_page' => -1,
-			'orderby' => 'post_title',
-			'order' => 'DESC'
-		);
-				
-		$cfilter = ( isset( $_COOKIE['anth-filter'] ) ) ? $_COOKIE['anth-filter'] : false;
-		
-		if ( $cfilter == 'date' ) {
-			$startdate = mysql_real_escape_string($_COOKIE['anth-startdate']);
-			$enddate = mysql_real_escape_string($_COOKIE['anth-enddate']);				
-							
-			$date_range_where = '';
-			if (strlen($startdate) > 0){
-			$date_range_where = " AND post_date >= '".$startdate."'";
-			}
-			if (strlen($enddate) > 0){
-			$date_range_where .= " AND post_date <= '".$enddate."'";
-			}
-
-			$where_func = '$where .= "'.$date_range_where.'"; return $where;'; 
-			$filter_where = create_function('$where', $where_func);
-			add_filter('posts_where', $filter_where);
-		} else {
-		
-			$cterm = ( isset( $_COOKIE['anth-term'] ) ) ? $_COOKIE['anth-term'] : false;
-					
-			if ( $cterm ) {
-				if ( $cfilter ) {
-					switch( $cfilter ) {
-						case 'tag' :
-							$filtertype = 'tag';
-							break;
-						case 'category' :
-							$filtertype = 'cat';
-							break;
-						case 'post_type' :
-							$filtertype = 'post_type';
-							break;
-					}
-					
-					$args[$filtertype] = $cterm;
-				}
-			}
-
-		}
-
-		$big_posts = new WP_Query( $args );
-
-		if ( $big_posts->have_posts() ) {
-		?>
-			<ul id="sidebar-posts">
-				<?php while ( $big_posts->have_posts() ) : $big_posts->the_post(); ?>
-                    <li class="item"><span class="fromNewId">new-<?php the_ID() ?></span><h3 class="part-item"><?php the_title() ?></h3></li>
-				<?php endwhile; ?>
-			</ul>
-		<?php
-		}
-
-        if ( $cfilter == 'date' ) {
-            remove_filter('posts_where', $filter_where);
-        }
+	
 	}
 
 	function get_posts_as_option_list( $part_id ) {
@@ -785,25 +459,4 @@ class Anthologize_Wordpress_Project_Organizer {
 	<?php
 	}
 	
-	/**
-	 * Get the href for an object's Preview link
-	 *
-	 * @package Anthologize
-	 * @since 0.6
-	 *
-	 * @param int $post_id The id of the post (item, part, or project) being previewed
-	 * @param str $post_type The post type of the post being previewed
-	 */
-	function preview_url( $post_id = false, $post_type = 'anth_library_item' ) {
-		$query_args = array(
-			'page'		=> 'anthologize',
-			'anth_preview' 	=> '1',
-			'post_id' 	=> $post_id,
-			'post_type'	=> $post_type
-		);	
-		
-		$url = add_query_arg( $query_args, admin_url( 'admin.php' ) );
-		
-		return $url;
-	}
 }

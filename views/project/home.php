@@ -41,14 +41,14 @@
 				<th scope="row" class="check-column"></th>
 
 				<th scope="row"  class="post-title">
-					<a href="admin.php?page=anthologize&amp;action=edit&amp;project_id=<?php the_ID() ?>" class="row-title"><?php the_title(); ?></a>
+					<a href="admin.php?page=anthologize&amp;action=manage&amp;project_id=<?php the_ID() ?>" class="row-title"><?php the_title(); ?></a>
 
 					<br />
 
 					<?php
 					$controlActions	= array();
 					$controlActions[]	= '<a href="admin.php?page=anthologize&action=edit&project_id=' . get_the_ID() .'">' . __('Project Details', 'anthologize') . '</a>';
-					$controlActions[]   = '<a href="admin.php?page=anthologize&action=edit&project_id=' . get_the_ID() .'">'.__('Manage Parts', 'anthologize') . '</a>';
+					$controlActions[]   = '<a href="admin.php?page=anthologize&action=manage&project_id=' . get_the_ID() .'">'.__('Manage Parts', 'anthologize') . '</a>';
 					$controlActions[]   = '<a href="admin.php?page=anthologize&action=delete&noheader=true&project_id=' . get_the_ID() .'" class="confirm-delete">'.__('Delete Project', 'anthologize') . '</a>';
 					?>
 

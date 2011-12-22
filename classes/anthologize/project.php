@@ -210,4 +210,23 @@ class Anthologize_Project {
 		}
 	}
 
+	/**
+	 * Gets the existing parts for a project
+	 *
+	 * @return   array   An array of existing parts for the project
+	 */
+	public function get_existing_parts()
+	{
+		$args = array(
+			'post_type' => 'anth_part',
+			'order' => 'ASC',
+			'orderby' => 'menu_order',
+			'post_per_page' => -1,
+			'showposts' => -1,
+			'post_parent' => $this->ID
+		);
+
+		return query_posts($args);
+	}
+
 }
