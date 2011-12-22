@@ -299,35 +299,24 @@ class Anthologize_Wordpress_Admin {
 	 * @retur str $location
 	 */
 	public function item_meta_redirect($location) {
-    		if ( isset( $_POST['post_parent'] ) ) {
-    			$post_parent_id = $_POST['post_parent'];
-    		} else {
-    			$post = get_post( $_POST['ID'] );
-    			$post_parent_id = $post->post_parent;
-    		}
-    		
-    		$post_parent = get_post( $post_parent_id );
+		if ( isset( $_POST['post_parent'] ) ) {
+			$post_parent_id = $_POST['post_parent'];
+		} else {
+			$post = get_post( $_POST['ID'] );
+			$post_parent_id = $post->post_parent;
+		}
 
-		if ( isset( $_POST['new_part'] ) )
-			$arg = $_POST['parent_id'];
-		else
-			$arg = $post_parent->post_parent;
-		
-		$location = add_query_arg( array(
+    	$post_parent = get_post( $post_parent_id );
+
+		$arg = isset($_POST['new_part']) ?
+			$_POST['parent_id'] :
+			$post_parent->post_parent;
+
+		return add_query_arg( array(
 			'page'	     => 'anthologize',
-			'action'     => 'edit',
+			'action'     => 'manage',
 			'project_id' => $arg
 		), admin_url( 'admin.php' ) );
-		
-		if ( isset( $_POST['return_to_project'] ) ) {
-			$location = add_query_arg( array(
-				'page'	     => 'anthologize',
-				'action'     => 'edit',
-				'project_id' => $_POST['return_to_project']
-			), admin_url( 'admin.php' ) );
-		}
-		
-		return $location;
     }
 
     /**
