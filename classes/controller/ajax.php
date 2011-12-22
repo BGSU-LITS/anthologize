@@ -18,9 +18,9 @@ class Controller_Ajax extends Controller
 	 */
 	public function __construct()
 	{
-		$this->action = $_POST['action'];
-		unset($_POST['action']);
-		$this->set_params($_POST);
+		$this->action = $_REQUEST['action'];
+		unset($_REQUEST['action']);
+		$this->set_params($_REQUEST);
 	}
 
 	/**
