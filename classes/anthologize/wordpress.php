@@ -204,8 +204,6 @@ class Anthologize_Wordpress
 			strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 		{
 			$ajax = new Controller_Ajax_WP;
-			$ajax->run();
-			exit();
 		}
 	}
 

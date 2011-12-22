@@ -41,6 +41,8 @@ class Controller_Ajax extends Controller
 		echo $this->content !== null ?
 			json_encode($this->content) :
 			"";
+
+		exit();
 	}
 
 }
