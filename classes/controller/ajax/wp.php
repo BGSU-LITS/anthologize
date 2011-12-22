@@ -28,6 +28,7 @@ class Controller_Ajax_WP extends Controller_Ajax
 		add_action( 'wp_ajax_get_item_comments', array( $this, 'run' ) );
 		add_action( 'wp_ajax_include_comments', array( $this, 'run' ) );
 		add_action( 'wp_ajax_include_all_comments', array( $this, 'run' ) );
+		add_action( 'wp_ajax_remove_post', array( $this, 'run' ) );
 
 		parent::__construct();
 	}
@@ -462,4 +463,15 @@ class Controller_Ajax_WP extends Controller_Ajax
 		echo json_encode( array_values( $comments->included_comments ) );
 		die();
 	}
+
+	/**
+	 * Removes a post from the given part
+	 */
+	public function remove_post()
+	{
+		$this->content = array(
+			'success' => wp_delete_post($this->param('remove')) !== false ? true : false
+		);
+	}
+
 }

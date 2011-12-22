@@ -102,7 +102,7 @@
 
 						<a target="_blank" href="admin.php?page=anthologize&action=preview&post_id=<?php echo get_the_ID(); ?>&post_type=anth_part" class=""><?php _e( 'Preview', 'anthologize' ) ?></a> |
 
-						<a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $project->ID ?>&remove=<?php echo get_the_ID() ?>" class="remove"><?php _e( 'Remove', 'anthologize' ) ?></a> |
+						<a href="admin.php?page=anthologize&action=remove_post&project_id=<?php echo $project->ID ?>&remove=<?php echo get_the_ID() ?>" class="remove"><?php _e( 'Remove', 'anthologize' ) ?></a> |
 						<a href="#collapse" class="collapsepart"> - </a> 
 					</div>
 
@@ -146,7 +146,7 @@
 									<?php
 									// admin.php?page=anthologize&action=edit&project_id=$this->project_id&append_parent= the_ID()
 									?>
-									<a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $project->ID ?>&remove=<?php the_ID() ?>" class="confirm"><?php _e( 'Remove', 'anthologize' ) ?></a>
+									<a href="admin.php?page=anthologize&action=remove_post&project_id=<?php echo $project->ID ?>&remove=<?php the_ID() ?>" class="confirm remove"><?php _e( 'Remove', 'anthologize' ) ?></a>
 								</div>
 							</h3>
 						</li>

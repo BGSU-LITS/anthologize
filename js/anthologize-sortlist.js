@@ -96,7 +96,7 @@ var anthologize = {
 	    "project_id": project_id,
 	    "dest_id": this.cleanPostIds(dest_id),
 	    "item_ids": item_ids,
-	    "dest_seq":  dest_seq,
+	    "dest_seq":  dest_seq
 	};
     
     	anth_admin_ajax.place_items(ajax_options);
@@ -191,10 +191,10 @@ var anthologize = {
 				
 				for (var itemId in response){
 					var commentid = response[itemId].comment_ID;
+
+					var checked = "";
 					if ( response[itemId].is_included ) {
-						var checked = ' checked="checked"';
-					} else {
-						var checked = '';
+						checked = ' checked="checked"';
 					}
 					
 					var comment = '<tr><td class="checkbox"><input type="checkbox" class="select-comment" name="comments[]" id="comment-' + commentid + '"' + checked + ' /></td>';
@@ -254,7 +254,7 @@ var anthologize = {
 				'<a href="post.php?post=' + new_item_id + '&amp;action=edit">' + anth_strings.edit + '</a> | ' + 
 				'<a class="append" href="#append">' + anth_strings.append + '</a><span class="append-sep toggle-sep"> | </span>' +
 				'<a class="anth-preview anth-preview-item" href="admin.php?page=anthologize&anth_preview=1&post_type=anth_library_item&post_id=' + new_item_id + '" target="new">' + anth_strings.preview + '</a><span class="toggle-sep"> | </span>' + 
-				'<a class="confirm" href="admin.php?page=anthologize&amp;action=edit&amp;' + 'project_id=' + anthologize.getProjectId() + '&amp;remove=' + new_item_id + '">' + anth_strings.remove + '</a>' +
+				'<a class="confirm" href="admin.php?page=anthologize&action=remove_post&' + 'project_id=' + anthologize.getProjectId() + '&remove=' + new_item_id + '">' + anth_strings.remove + '</a>' +
 			'</div>';
 	
 	newItem.children("h3").append(buttons);
@@ -606,5 +606,36 @@ jQuery(document).ready(function(){
 				p.find("a.collapsepart").text(' + ');
 	  	}
 		}
-	}	
+	}
+
+	// Ajaxify the remove part button
+	jQuery('#partlist .remove').live("click", function(e){
+		e.preventDefault(); // Stop the click action
+
+		if (confirm("Are you sure?")){
+			var li = jQuery(this).closest("li")[0],
+				params = jQuery(this).attr('href').replace("admin.php", "");
+
+			jQuery.ajax({
+				url: ajaxurl,
+				type: 'POST',
+				dataType: 'json',
+				data: params,
+				async:false,
+				timeout:20000,
+				success: function(response){
+					if (response.success != false) {
+						jQuery(li).fadeOut("normal", function(){
+							jQuery(li).remove();
+						});
+					}
+
+					jQuery.unblockUI();
+				},
+				error: function(){
+					ajax_error_refresh();
+				}
+			});
+		}
+	});
 });
