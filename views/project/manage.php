@@ -146,7 +146,7 @@
 									<?php
 									// admin.php?page=anthologize&action=edit&project_id=$this->project_id&append_parent= the_ID()
 									?>
-									<a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $this->project_id ?>&remove=<?php the_ID() ?>" class="confirm"><?php _e( 'Remove', 'anthologize' ) ?></a>
+									<a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $project->ID ?>&remove=<?php the_ID() ?>" class="confirm"><?php _e( 'Remove', 'anthologize' ) ?></a>
 								</div>
 							</h3>
 						</li>
