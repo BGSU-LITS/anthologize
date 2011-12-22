@@ -130,7 +130,7 @@ class Anthologize_Wordpress_Admin {
 		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'New Project','anthologize' ), __('New Project','anthologize'), $this->minimum_cap, 'anthologize&action=create', array ("Anthologize", 'router'));
 		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'Export Project', 'anthologize' ), __( 'Export Project', 'anthologize' ), $this->minimum_cap, 'anthologize&action=export', array ("Anthologize", 'router') );
 		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'Import Content', 'anthologize' ), __( 'Import Content', 'anthologize' ), $this->minimum_cap, 'anthologize&action=import', array ("Anthologize", 'router') );
-		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'Settings', 'anthologize' ), __( 'Settings', 'anthologize' ), $this->minimum_cap, 'anthologize&action=settings', array ("Anthologize", 'router'));
+		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'Settings', 'anthologize' ), __( 'Settings', 'anthologize' ), $this->minimum_cap, 'anthologize&controller=settings', array ("Anthologize", 'router'));
 		
 		foreach ( $plugin_pages as $plugin_page ) {
 			add_action( "admin_print_styles", array( $this, 'load_styles' ) );
