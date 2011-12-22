@@ -93,14 +93,14 @@
 					while(have_posts()):
 					the_post();
 			?>
-				<li class="part" id="part-<?php echo get_the_ID() ?>">
+				<li class="part" id="part-<?php echo get_the_ID(); ?>">
 					<h3 class="part-header"><noscript><a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $project->ID ?>&move_up=<?php echo get_the_ID() ?>">&uarr;</a> <a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $project->ID ?>&move_down=<?php echo get_the_ID() ?>">&darr;</a> </noscript>
-					<span class="part-title-header"><?php echo get_the_title() ?></span>
+					<span class="part-title-header"><?php echo get_the_title(); ?></span>
 
 					<div class="part-buttons">
 						<a href="post.php?post=<?php echo get_the_ID() ?>&action=edit&return_to_project=<?php echo $project->ID ?>"><?php _e( 'Edit', 'anthologize' ) ?></a> |
 
-						<a target="_blank" href="<?php echo $this->preview_url( get_the_ID(), 'anth_part' ) ?>" class=""><?php _e( 'Preview', 'anthologize' ) ?></a> |
+						<a target="_blank" href="admin.php?page=anthologize&action=preview&post_id=<?php echo get_the_ID(); ?>&post_type=anth_part" class=""><?php _e( 'Preview', 'anthologize' ) ?></a> |
 
 						<a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $project->ID ?>&remove=<?php echo get_the_ID() ?>" class="remove"><?php _e( 'Remove', 'anthologize' ) ?></a> |
 						<a href="#collapse" class="collapsepart"> - </a> 
@@ -110,7 +110,49 @@
 
 					<div class="part-items">
 						<ul>
-							<?php $this->get_part_items( $part_id ) ?>
+					<?php
+						$items = Anthologize_Part::get_part_items(get_the_ID());
+						if ($items->have_posts()):
+							while($items->have_posts()):
+								$items->the_post();
+					?>
+							<li id="item-<?php the_ID() ?>" class="item">
+
+							<?php
+								if ( isset($_GET['append_parent']) ) :
+									$append_parent = $_GET['append_parent'];
+							?>
+								<input type="checkbox" name="append_children[]" value="<?php the_ID() ?>" <?php if ( $append_parent == get_the_ID() ) echo 'checked="checked" disabled=disabled'; ?>/> <?php echo get_the_ID() . " " . $append_parent ?>
+							<?php endif; ?>
+
+							<noscript>
+								<a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $project->ID ?>&move_up=<?php the_ID() ?>">&uarr;</a> <a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $project->ID ?>&move_down=<?php the_ID() ?>">&darr;</a>
+							</noscript>
+
+							<h3 class="part-item">
+								<span class="part-title"><?php the_title() ?></span>
+								<div class="part-item-buttons">
+									<a href="post.php?post=<?php the_ID() ?>&action=edit&return_to_project=<?php echo $project->ID ?>"><?php _e( 'Edit', 'anthologize' ) ?></a> |
+
+									<?php /* Comments are being pushed to 0.7 */ ?>
+									<?php /*
+									<a href="#comments" class="comments toggle"><?php printf( __( 'Comments (<span class="included-comment-count">%1$d</span>/%2$d)', 'anthologize' ), $included_comment_count, $original_comment_count ) ?></a><span class="comments-sep toggle-sep"> |</span>
+									*/ ?>
+
+									<a href="#append" class="append toggle"><?php _e( 'Append', 'anthologize' ) ?></a><span class="append-sep toggle-sep"> |</span>
+
+									<a target="new" href="admin.php?page=anthologize&action=preview&post_id=<?php echo get_the_ID(); ?>&post_type=anth_library_item" class=""><?php _e( 'Preview', 'anthologize' ) ?></a><span class="toggle-sep"> |</span>
+
+									<?php
+									// admin.php?page=anthologize&action=edit&project_id=$this->project_id&append_parent= the_ID()
+									?>
+									<a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $this->project_id ?>&remove=<?php the_ID() ?>" class="confirm"><?php _e( 'Remove', 'anthologize' ) ?></a>
+								</div>
+							</h3>
+						</li>
+					<?php
+							endwhile;
+						endif; ?>
 						</ul>
 					</div>
 
