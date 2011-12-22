@@ -59,92 +59,9 @@ class Anthologize_Wordpress_Project_Organizer {
 				$nulltext = ' - ';
 				break;
 		}
-
-		?>
-			
-			
-			
-		<?php
-	}
-
-	function filter_date(){
-		?>
-		
-
-		<?php
 	}
 	
 	
-
-	function add_item_to_part( $item_id, $part_id ) {
-		global $wpdb, $current_user;
-
-		if ( !(int)$last_item = get_post_meta( $part_id, 'last_item', true ) )
-			$last_item = 0;
-
-		$last_item++;
-		$the_item = get_post( $item_id );
-		$part = get_post( $part_id );
-
-		$args = array(
-		  'menu_order' => $last_item,
-		  'comment_status' => $the_item->comment_status,
-		  'ping_status' => $the_item->ping_status,
-		  'pinged' => $the_item->pinged,
-		  'post_author' => $current_user->ID,
-		  'post_content' => $the_item->post_content,
-		  'post_date' => $the_item->post_date,
-		  'post_date_gmt' => $the_item->post_date_gmt,
-		  'post_excerpt' => $the_item->post_excerpt,
-		  'post_parent' => $part_id,
-		  'post_password' => $the_item->post_password,
-		  'post_status' => $part->post_status, // post_status is set to the post_status of the parent part
-		  'post_title' => $the_item->post_title,
-		  'post_type' => 'anth_library_item',
-		  'to_ping' => $the_item->to_ping, // todo: tags and categories
-		);
-
-        // WordPress will strip these slashes off in wp_insert_post
-        $args = add_magic_quotes($args);
-
-		if ( !$imported_item_id = wp_insert_post( $args ) )
-			return false;
-		
-		// Update the parent project's Date Modified field to right now
-		$this->update_project_modified_date();
-
-		// Author data
-		$user = get_userdata( $the_item->post_author );
-
-		if ( !$author_name = get_post_meta( $item_id, 'author_name', true ) )
-			$author_name = $user->display_name;
-		$author_name_array = array( $author_name );
-
-		$anthologize_meta = apply_filters( 'anth_add_item_postmeta', array(
-			'author_name' => $author_name,
-			'author_name_array' => $author_name_array,
-			'author_id' => $the_item->post_author,
-			'original_post_id' => $item_id
-		) );
-		
-		update_post_meta( $imported_item_id, 'anthologize_meta', $anthologize_meta );
-		
-		update_post_meta( $imported_item_id, 'author_name', $author_name ); // Deprecated - please use anthologize_meta
-		update_post_meta( $imported_item_id, 'author_name_array', $author_name_array ); // Deprecated - please use anthologize_meta
-
-		return $imported_item_id;
-	}
-	
-	function update_project_modified_date() {
-		$project_post = get_post( $this->project_id );
-		$project_args = array(
-			'ID' => $this->project_id,
-            'post_modified' => date( "Y-m-d G:H:i" ),
-            'post_modified_gmt' => gmdate( "Y-m-d G:H:i" )
-		);
-		wp_update_post( $project_args );
-	}
-
 	function add_new_part( $part_name ) {
 		if ( !(int)$last_item = get_post_meta( $this->project_id, 'last_item', true ) )
 			$last_item = 0;
@@ -169,9 +86,6 @@ class Anthologize_Wordpress_Project_Organizer {
 		$this->update_project_modified_date();
 
 		return true;
-	}
-
-	
 	}
 
 	function get_posts_as_option_list( $part_id ) {
@@ -287,60 +201,6 @@ class Anthologize_Wordpress_Project_Organizer {
 		return true;
 	}
 
-
-
-	function insert_item( $project_id, $post_id, $new_post, $dest_id, $source_id, $dest_seq, $source_seq ) {
-		global $wpdb;
-		if ( !isset( $project_id ) || !isset( $post_id ) || !isset( $dest_id ) || !isset( $dest_seq ) )
-			return false;
-
-		if ( !$new_post ) {
-			if ( !isset( $source_id ) || !isset( $source_seq ) )
-				return false;
-		}
-
-		if ( true === $new_post ) {
-			$add_item_result = $this->add_item_to_part( $post_id, $dest_id );
-			if (false === $add_item_result) {
-				return false;
-			}
-			$post_id = $add_item_result;
-      // $dest_seq[$post_id] = $dest_seq['new_new_new'];
-      // unset($dest_seq['new_new_new']);
-		} else {
-			$post_params = Array('ID' => $post_id,
-				'post_parent' => $dest_id);
-			$update_item_result = wp_update_post($post_params);
-			if (0 === $update_item_result) {
-				return false;
-			}
-			$post_id = $update_item_result;
-			$this->rearrange_items( $source_seq );
-		}
-
-        // not really any point in checking for errors at this point
-        // Since the insert succeeded
-        // We should use more detailed Exceptions eventually
-        //
-		// All items require the destination siblings to be reordered
-/*		if ( !$this->rearrange_items( $dest_seq ) )
-    return false;*/
-		//$this->rearrange_items( $dest_seq );
-
-		return $post_id;
-	}
-
-	function rearrange_items( $seq ) {
-        global $wpdb;
-		foreach ( $seq as $item_id => $pos ) {
-			$q = "UPDATE $wpdb->posts SET menu_order = %d WHERE ID = %d";
-			$post_up_query = $wpdb->query( $wpdb->prepare( $q, $pos, $item_id ) );
-		}
-		
-		$this->update_project_modified_date();
-
-		return true;
-	}
 
 	function remove_item( $id ) {
 		// Git ridda the post

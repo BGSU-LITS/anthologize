@@ -75,7 +75,96 @@ class Anthologize_Project {
 			}
 		}
 	}
-	
+
+	/**
+	 * Inserts a post into the part
+	 *
+	 * @global WPDB  $wpdb         The Wordpress Database instance
+	 * @param  int   $project_id   The project id to insert into
+	 * @param  int   $post_id      The post id to insert into
+	 * @param type $new_post
+	 * @param type $dest_id
+	 * @param type $source_id
+	 * @param type $dest_seq
+	 * @param type $source_seq
+	 * @return  int                The post id
+	 */
+	public static function insert_item( $project_id, $post_id, $new_post, $dest_id, $source_id, $dest_seq, $source_seq ) {
+		global $wpdb;
+		if ( !isset( $project_id ) || !isset( $post_id ) || !isset( $dest_id ) || !isset( $dest_seq ) )
+			return false;
+
+		if ( !$new_post ) {
+			if ( !isset( $source_id ) || !isset( $source_seq ) )
+				return false;
+		}
+
+		if ( true === $new_post ) {
+			$add_item_result = Anthologize_Part::add_item_to_part( $post_id, $dest_id );
+			if (false === $add_item_result) {
+				return false;
+			}
+			$post_id = $add_item_result;
+      // $dest_seq[$post_id] = $dest_seq['new_new_new'];
+      // unset($dest_seq['new_new_new']);
+		} else {
+			$post_params = Array('ID' => $post_id,
+				'post_parent' => $dest_id);
+			$update_item_result = wp_update_post($post_params);
+			if (0 === $update_item_result) {
+				return false;
+			}
+			$post_id = $update_item_result;
+			self::rearrange_items( $project_id, $source_seq );
+		}
+
+        // not really any point in checking for errors at this point
+        // Since the insert succeeded
+        // We should use more detailed Exceptions eventually
+        //
+		// All items require the destination siblings to be reordered
+/*		if ( !$this->rearrange_items( $dest_seq ) )
+    return false;*/
+		//$this->rearrange_items( $dest_seq );
+
+		return $post_id;
+	}
+
+	/**
+	 * Rearranges items in the part
+	 *
+	 * @global type $wpdb
+	 * @param   int   $project_id   The project id to update
+	 * @param type $seq
+	 * @return  boolean
+	 */
+	public static function rearrange_items( $project_id, $seq ) {
+        global $wpdb;
+		foreach ( $seq as $item_id => $pos ) {
+			$q = "UPDATE $wpdb->posts SET menu_order = %d WHERE ID = %d";
+			$post_up_query = $wpdb->query( $wpdb->prepare( $q, $pos, $item_id ) );
+		}
+
+		self::update_project_modified_date($project_id);
+
+		return true;
+	}
+
+	/**
+	 * Updates the modified date on a project
+	 *
+	 * @param   int   $id     The project id to update
+	 */
+	public static function update_project_modified_date($id) {
+		$project = Anthologize_Project::get($id);
+		$project_args = array(
+			'ID' => $project->ID,
+            'post_modified' => date( "Y-m-d G:H:i" ),
+            'post_modified_gmt' => gmdate( "Y-m-d G:H:i" )
+		);
+		wp_update_post( $project_args );
+	}
+
 	/**
 	 * @var   array   Array of post data
 	 */

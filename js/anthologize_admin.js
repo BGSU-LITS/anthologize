@@ -37,10 +37,11 @@ var anth_admin_ajax = {
             timeout:20000,
             success: function(data){
                 if (config_obj.new_item == 'true') {
-                	for (var i in data) {
-			    anthologize.updateAddedItem(data[i].post_id, data[i].comment_count, false);
-			}
-                }
+					jQuery.each(data, function(index, ele){
+						anthologize.updateAddedItem(ele.post_id, ele.comment_count, false);
+					});
+				}
+
                 anthologize.setAppendStatus();
                 jQuery.unblockUI();
             },

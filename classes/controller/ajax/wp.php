@@ -162,67 +162,73 @@ class Controller_Ajax_WP extends Controller_Ajax
     }
 
     /**
+	 * Places an item into a project.
+	 *
      * @todo Merge this with place_items. No reason for two functions
      */
-    function place_item() {	
+    public function place_item() {
     	global $wpdb;
     	
-        $project_id = $_POST['project_id'];
-        $post_id = $_POST['post_id'];
-        $dest_part_id = $_POST['dest_id'];
-        $dest_seq = stripslashes($_POST['dest_seq']);
-        $dest_seq_array = json_decode($dest_seq, $assoc=true);
+        $project_id = $this->param('project_id');
+        $post_id = $this->param('post_id');
+        $dest_part_id = $this->param('dest_id');
+        $dest_seq = stripslashes($this->param('dest_seq'));
+        $dest_seq_array = json_decode($dest_seq, true);
         if ( NULL === $dest_seq_array ) {
             header('HTTP/1.1 500 Internal Server Error');
             die();
         }
-        
-        if ('true' === $_POST['new_post']) {
+
+        if ('true' === $this->param('new_post')) {
             $new_item = true;
             $src_part_id = false;
             $src_seq_array = false;
         } else {
             $new_item = false;
-            $src_part_id = $_POST['src_id'];
-            $src_seq = stripslashes($_POST['src_seq']);
-            $src_seq_array = json_decode($src_seq, $assoc=true);
+            $src_part_id = $this->param('src_id');
+            $src_seq = stripslashes($this->param('src_seq'));
+			$src_seq_array = json_decode($src_seq, true);
             if ( NULL === $src_seq_array ) {
                 header('HTTP/1.1 500 Internal Server Error');
                 die();
             }
         }
 
-        $insert_result_id = $this->project_organizer->insert_item($project_id, $post_id, $new_item, $dest_part_id, $src_part_id, $dest_seq_array, $src_seq_array);
+        $insert_result_id = Anthologize_Project::insert_item($project_id, $post_id, $new_item, $dest_part_id, $src_part_id, $dest_seq_array, $src_seq_array);
 
         if (false === $insert_result_id) {
-		header('HTTP/1.1 500 Internal Server Error');
-		die();
+			header('HTTP/1.1 500 Internal Server Error');
+			die();
         } else {
-		if (true == $new_item){
-      			$dest_seq_array[$insert_result_id] = $dest_seq_array['new_new_new'];
-      			unset($dest_seq_array['new_new_new']);
-		}
-		
-		$this->project_organizer->rearrange_items($dest_seq_array);
-				
-		// Get the comment count for the original item
-		$comment_count = $wpdb->get_var( $wpdb->prepare( "SELECT comment_count FROM $wpdb->posts WHERE ID = %s", $post_id ) );
-		
-		// Assemble the array to return
-		$insert_result = array(
-			array(
-				'post_id'	=> $insert_result_id,
-				'comment_count'	=> $comment_count
-			),
-		);
-		
-		echo json_encode( $insert_result );
-        }
+			if (true == $new_item){
+				$dest_seq_array[$insert_result_id] = $dest_seq_array['new_new_new'];
+				unset($dest_seq_array['new_new_new']);
+			}
 
-        die();
+			// This is already called in Anthologize_Project::insert_item
+			//Anthologize_Project::rearrange_items($project_id, $dest_seq_array);
+
+			// Get the comment count for the original item
+			$comment_count = $wpdb->get_var( $wpdb->prepare( "SELECT comment_count FROM $wpdb->posts WHERE ID = %s", $post_id ) );
+
+			// Assemble the array to return
+			$insert_result = array(
+				array(
+					'post_id'	=> $insert_result_id,
+					'comment_count'	=> $comment_count
+				),
+			);
+
+			$this->content = $insert_result;
+        }
     }
 
-	function place_items() {
+	/**
+	 * Places a list of items into a part.
+	 *
+	 * @global type $wpdb 
+	 */
+	public function place_items() {
 		global $wpdb;
 		
 		$project_id = $_POST['project_id'];
