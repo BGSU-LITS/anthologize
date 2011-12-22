@@ -251,7 +251,7 @@ class Anthologize_Wordpress_Admin {
 	 * @param  int  $post_id  The post id
 	 */ 
 	function meta_save_box( $post_id ) {
-		Anthologize::render('meta/save_box', array('post_id' => $post_id));
+		echo Anthologize::render('meta/save_box', array('post_id' => $post_id));
 	}
 
 	/**
@@ -339,10 +339,10 @@ class Anthologize_Wordpress_Admin {
      * fields are not present on the form.
      **/
     function item_meta_box() {
-
         global $post;
 
-		Anthologize::render("meta/edit", array(
+		echo Anthologize::render("meta/edit", array(
+			'post' => $post,
 			'meta' => get_post_meta( $post->ID, 'anthologize_meta', TRUE ),
 			'imported_item_meta' => get_post_meta( $post->ID, 'imported_item_meta', true ),
 			'author_name' => get_post_meta( $post->ID, 'author_name', true )
