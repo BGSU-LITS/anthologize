@@ -1,34 +1,141 @@
 <?php defined("ANTHOLOGIZE") or die("No direct script access.");
 /**
- * Ajax handlers for Wordpress.
+ * Handles the ajax requests in Wordpress.
  *
  * @package      Anthologize
  * @author       One Week | One Tool
  * @copyright    Copyright (C) 2010 Center for History and New Media, George Mason University
  */
-class Anthologize_Wordpress_Ajax_Handlers {
+class Controller_Ajax_WP extends Controller_Ajax
+{
+	/**
+	 * @var   Anthologize_Project    The project to work on
+	 */
+	protected $project = null;
 
-    var $project_organizer = null;
+	/**
+	 * Adds the wordpress ajax hooks
+	 */
+	public function __construct()
+	{
+		// Set some wordpress ajax handlers
+		add_action( 'wp_ajax_get_filterby_terms', array( $this, 'run' ) );
+		add_action( 'wp_ajax_get_posts_by', array( $this, 'run' ) );
+		add_action( 'wp_ajax_place_item', array( $this, 'run' ) );
+		add_action( 'wp_ajax_place_items', array( $this, 'run' ) );
+		add_action( 'wp_ajax_merge_items', array( $this, 'run' ) );
+		add_action( 'wp_ajax_get_project_meta', array( $this, 'run' ) );
+		add_action( 'wp_ajax_get_item_comments', array( $this, 'run' ) );
+		add_action( 'wp_ajax_include_comments', array( $this, 'run' ) );
+		add_action( 'wp_ajax_include_all_comments', array( $this, 'run' ) );
 
-    function anthologize_ajax_handlers() {
-        add_action( 'wp_ajax_get_filterby_terms', array( $this, 'get_filterby_terms' ) );
-        add_action( 'wp_ajax_get_posts_by', array( $this, 'get_posts_by' ) );
-        add_action( 'wp_ajax_place_item', array( $this, 'place_item' ) );
-        add_action( 'wp_ajax_place_items', array( $this, 'place_items' ) );
-        add_action( 'wp_ajax_merge_items', array( $this, 'merge_items' ) );
-        add_action( 'wp_ajax_get_project_meta', array( $this, 'fetch_project_meta' ) );
-        add_action( 'wp_ajax_get_item_comments', array( $this, 'get_item_comments' ) );
-        add_action( 'wp_ajax_include_comments', array( $this, 'include_comments' ) );
-        add_action( 'wp_ajax_include_all_comments', array( $this, 'include_all_comments' ) );
+		parent::__construct();
+	}
+
+	/**
+	 * Gets the project and sets the handlers
+	 */
+    public function before()
+	{
+		$id = isset($_POST['project_id']) ? $_POST['project_id'] : false;
+		if ($id !== false)
+		{
+			$this->project = Anthologize_Project::get($id);
+		}
     }
 
-    function __construct() {
-        $this->anthologize_ajax_handlers();
-        $project_id = ( isset( $_POST['project_id'] ) ) ? $_POST['project_id'] : 0;
-                
-        $this->project_organizer = new Anthologize_Wordpress_Project_Organizer($project_id);
-       
-    }
+	/**
+	 * Gets a list of options for a given filter.
+	 */
+	public function get_filterby_terms()
+	{
+		$filtertype = $this->param('filtertype');
+
+		$terms = array();
+
+		switch ( $filtertype ) {
+			case 'category' :
+				$cats = get_categories();
+				foreach( $cats as $cat ) {
+					$terms[$cat->term_id] = $cat->name;
+				}
+				break;
+
+			case 'tag' :
+				$tags = get_tags();
+				foreach( $tags as $tag ) {
+					$terms[$tag->slug] = $tag->name;
+				}
+				break;
+
+			case 'post_type' :
+				$terms = $this->project_organizer->available_post_types();
+				break;
+		}
+
+		$this->content = apply_filters( 'anth_get_posts_by', $terms, $filtertype );
+	}
+
+	/**
+	 * Gets all of the posts by a certian filter.
+	 */
+    public function get_posts_by() {
+		$filterby = $this->param('filterby');
+
+		$args = array(
+			'post_type' => array_keys($this->project->available_post_types()),
+			'posts_per_page' => -1,
+			'orderby' => 'post_date',
+			'order' => 'DESC'
+		);
+
+		switch ( $filterby ) {
+			case 'date' :
+				$startdate = mysql_real_escape_string($this->param('startdate'));
+				$enddate = mysql_real_escape_string($this->param('enddate'));				
+								
+				$date_range_where = '';
+				if (strlen($startdate) > 0){
+				$date_range_where = " AND post_date >= '".$startdate."'";
+				}
+				if (strlen($enddate) > 0){
+				$date_range_where .= " AND post_date <= '".$enddate."'";
+				}
+
+				$where_func = '$where .= "'.$date_range_where.'"; return $where;'; 
+				$filter_where = create_function('$where', $where_func);
+				add_filter('posts_where', $filter_where);
+
+				break;
+			
+			case 'tag' :
+				$args['tag'] = $this->param('term');
+				break;
+			
+			case 'category' :
+				$args['cat'] = $this->param('term');
+				break;
+			
+			case 'post_type' :
+				if ($this->param('term', "") != ''){
+					$args['post_type'] = $this->param('term');
+				}
+				break;
+		}
+		// Allow plugins to modify the query_post arguments
+		$posts = new WP_Query( apply_filters( 'anth_get_posts_by_query', $args, $filterby ) );
+		
+		$the_posts = array();
+		while ( $posts->have_posts() ) {
+			$posts->the_post();
+			$the_posts[get_the_ID()] = get_the_title();
+		}
+		if ($filterby == 'date'){
+			remove_filter('posts_where', $filter_where);
+		}
+		
+		$this->content = apply_filters( 'anth_get_posts_by', $the_posts, $filterby );
+	}
 
     function fetch_tags() {
         $tags = get_tags();
@@ -53,99 +160,6 @@ class Anthologize_Wordpress_Ajax_Handlers {
         print(json_encode($the_cats));
         die();
     }
-
-	function get_filterby_terms() {
-		$filtertype = $_POST['filtertype'];
-		
-		$terms = array();
-		
-		switch ( $filtertype ) {
-			case 'category' :
-				$cats = get_categories();
-				foreach( $cats as $cat ) {
-					$terms[$cat->term_id] = $cat->name;
-				}
-				break;
-			
-			case 'tag' :
-				$tags = get_tags();
-				foreach( $tags as $tag ) {
-					$terms[$tag->slug] = $tag->name;
-				}
-				break;
-			
-			case 'post_type' :
-				$terms = $this->project_organizer->available_post_types();
-				break;
-		}
-				
-		$terms = apply_filters( 'anth_get_posts_by', $terms, $filtertype );
-		
-		print( json_encode( $terms ) );
-		die();
-	}
-
-    function get_posts_by() {
-		$filterby = $_POST['filterby'];
-
-		$args = array(
-			'post_type' => array_keys($this->project_organizer->available_post_types()),
-			'posts_per_page' => -1,
-			'orderby' => 'post_date',
-			'order' => 'DESC'
-		);
-
-		switch ( $filterby ) {
-			case 'date' :
-				$startdate = mysql_real_escape_string($_POST['startdate']);
-				$enddate = mysql_real_escape_string($_POST['enddate']);				
-								
-				$date_range_where = '';
-				if (strlen($startdate) > 0){
-				$date_range_where = " AND post_date >= '".$startdate."'";
-				}
-				if (strlen($enddate) > 0){
-				$date_range_where .= " AND post_date <= '".$enddate."'";
-				}
-
-				$where_func = '$where .= "'.$date_range_where.'"; return $where;'; 
-				$filter_where = create_function('$where', $where_func);
-				add_filter('posts_where', $filter_where);
-
-				break;
-			
-			case 'tag' :
-				$args['tag'] = $_POST['term'];
-				break;
-			
-			case 'category' :
-				$args['cat'] = $_POST['term'];
-				break;
-			
-			case 'post_type' :
-				if ($_POST['term'] != ''){
-					$args['post_type'] = $_POST['term'];
-				}
-				break;
-		}
-		// Allow plugins to modify the query_post arguments
-		$posts = new WP_Query( apply_filters( 'anth_get_posts_by_query', $args, $filterby ) );
-		
-		$the_posts = Array();
-		while ( $posts->have_posts() ) {
-			$posts->the_post();
-			$the_posts[get_the_ID()] = get_the_title();
-		}
-		if ($filterby == 'date'){
-			remove_filter('posts_where', $filter_where);
-		}
-		
-		$the_posts = apply_filters( 'anth_get_posts_by', $the_posts, $filterby );
-		
-		print(json_encode($the_posts));
-
-		die();
-	}
 
     /**
      * @todo Merge this with place_items. No reason for two functions

@@ -30,11 +30,14 @@ class Anthologize_Wordpress
 
 		add_action( 'init', array ( "Anthologize_Wordpress", 'init' ) );
 
-		// Load the post types
-		add_action( 'anthologize_init', array ( "Anthologize_Wordpress", 'register_post_types' ) );
-
 		// Load constants
 		add_action( 'anthologize_init',  array ( "Anthologize_Wordpress", 'load_constants' ) );
+
+		// Check for an ajax request
+		add_action( 'anthologize_init', array("Anthologize_Wordpress", 'check_ajax'));
+
+		// Load the post types
+		add_action( 'anthologize_init', array ( "Anthologize_Wordpress", 'register_post_types' ) );
 
 		// Load the custom feed
 		add_action( 'do_feed_customfeed', array ( "Anthologize_Wordpress", 'register_custom_feed' ) );
@@ -158,6 +161,25 @@ class Anthologize_Wordpress
 		    define('ANTHOLOGIZE_CREATORS_ALL', 1);
 		if ( !defined('ANTHOLOGIZE_CREATORS_ASSERTED'))
 		    define('ANTHOLOGIZE_CREATORS_ASSERTED', 2);
+	}
+
+	/**
+	 * Checks to see if this is an ajax request.
+	 *
+	 * If so we don't need the whole plugin loop, just output the reponse and
+	 * be done with the request
+	 *
+	 * @see http://davidwalsh.name/detect-ajax
+	 */
+	public function check_ajax()
+	{
+		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) AND
+			strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+		{
+			$ajax = new Controller_Ajax_WP;
+			$ajax->run();
+			exit();
+		}
 	}
 
 	/**
@@ -427,7 +449,6 @@ class Anthologize_Wordpress
 
 		if ( is_admin() ) {
 			$admin = new Anthologize_Wordpress_Admin;
-			//$ajax_handlers = new Anthologize_Wordpress_Ajax_Handlers;
 		}
 
 		require_once Anthologize::find_file('includes', 'class-format-api');
