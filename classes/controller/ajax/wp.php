@@ -206,7 +206,7 @@ class Controller_Ajax_WP extends Controller_Ajax
 			}
 
 			// This is already called in Anthologize_Project::insert_item
-			//Anthologize_Project::rearrange_items($project_id, $dest_seq_array);
+			Anthologize_Project::rearrange_items($project_id, $dest_seq_array);
 
 			// Get the comment count for the original item
 			$comment_count = $wpdb->get_var( $wpdb->prepare( "SELECT comment_count FROM $wpdb->posts WHERE ID = %s", $post_id ) );
