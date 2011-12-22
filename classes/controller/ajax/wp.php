@@ -69,7 +69,7 @@ class Controller_Ajax_WP extends Controller_Ajax
 				break;
 
 			case 'post_type' :
-				$terms = $this->project_organizer->available_post_types();
+				$terms = Anthologize_Wordpress::available_post_types();
 				break;
 		}
 
@@ -83,7 +83,7 @@ class Controller_Ajax_WP extends Controller_Ajax
 		$filterby = $this->param('filterby');
 
 		$args = array(
-			'post_type' => array_keys($this->project->available_post_types()),
+			'post_type' => array_keys(Anthologize_Wordpress::available_post_types()),
 			'posts_per_page' => -1,
 			'orderby' => 'post_date',
 			'order' => 'DESC'

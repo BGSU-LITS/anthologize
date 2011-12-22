@@ -142,6 +142,33 @@ class Anthologize_Wordpress
 	}
 
 	/**
+	 * Gets a list of all available post types (excluding the anthologize types)
+	 *
+	 * @return   array      Array of available post types
+	 */
+	public static function available_post_types()
+	{
+		$all_post_types = get_post_types( false, false );
+
+		$excluded_post_types = apply_filters( 'anth_excluded_post_types', array(
+			'anth_library_item',
+			'anth_part',
+			'anth_project',
+			'attachment',
+			'revision',
+			'nav_menu_item'
+		) );
+
+		$types = array();
+		foreach( $all_post_types as $name => $post_type ) {
+			if ( !in_array( $name, $excluded_post_types ) )
+				$types[$name] = isset( $post_type->labels->name ) ? $post_type->labels->name : $name;
+		}
+
+		return apply_filters( 'anth_available_post_types', $types );
+	}
+
+	/**
 	 * Sets up anthologize constants
 	 */
 	public function load_constants() {
