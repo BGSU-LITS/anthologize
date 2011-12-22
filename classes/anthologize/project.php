@@ -134,6 +134,17 @@ class Anthologize_Project {
 	}
 
 	/**
+	 * Gets the value of a non-existant property
+	 *
+	 * @param   string   $name   The name of the property to get
+	 * @return  mixed            The value OR null
+	 */
+	public function __get($name)
+	{
+		return $this->param($name, null);
+	}
+
+	/**
 	 * Saves the project
 	 */
 	public function save()
