@@ -17,6 +17,12 @@
 
 	</h2>
 
+	<?php if ( isset( $_GET['edited'] ) ) : ?>
+		<div id="message" class="updated below-h2">
+			<p><?php _e( 'Item edited', 'anthologize' ) ?></p>
+		</div>
+	<?php endif; ?>
+
 	<?php if ( isset( $_GET['append_parent'] ) && !isset( $_GET['append_children'] ) ) : ?>
 		<div id="message" class="updated below-h2">
 			<p><?php _e( 'Select the items you would like to append and click Go.', 'anthologize' ) ?></p>

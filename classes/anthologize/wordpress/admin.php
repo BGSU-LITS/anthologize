@@ -305,7 +305,8 @@ class Anthologize_Wordpress_Admin {
 			$location = add_query_arg( array(
 				'page'	     => 'anthologize',
 				'action'     => 'manage',
-				'project_id' => $_POST['return_to_project']
+				'project_id' => $_POST['return_to_project'],
+				'edited'     => 1,
 			), admin_url( 'admin.php' ) );
 		}
 
