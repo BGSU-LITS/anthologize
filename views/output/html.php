@@ -1,70 +1,21 @@
-
-include_once(ANTHOLOGIZE_TEIDOM_PATH);
-include_once(ANTHOLOGIZE_TEIDOMAPI_PATH);
-require_once(WP_PLUGIN_DIR. '/anthologize/includes/theming-functions.php');
-global $api;
-
-//TODO: simplify and condense these options
-
-$ops = array('includeStructuredSubjects' => true, //Include structured data about tags and categories
-		'includeComments' => false,
-		'includeItemSubjects' => true, // Include basic data about tags and categories
-		'includeCreatorData' => true, // Include basic data about creators
-		'includeStructuredCreatorData' => true, //include structured data about creators
-		'includeOriginalPostData' => true, //include data about the original post (true to use tags and categories and creator data)
-		'checkImgSrcs' => false, //whether to check availability of image sources
-		'linkToEmbeddedObjects' => false,
-		'indexSubjects' => false,
-		'indexCategories' => false,
-		'indexTags' => false,
-		'indexPeople' => false,
-		'indexImages' => false,
-		);
-
-
-$ops['outputParams'] = $_SESSION['outputParams'];
-
-
-$tei = new TeiDom($_SESSION, $ops);
-
-header("Content-type: text/html");
-
-$api = new TeiApi($tei);
-
-
-$fileName = $api->getFileName();
-$ext = "html";
-
-if( isset($ops['outputParams']['download']) ) {
-	header("Content-type: text/html");
-	header("Content-Disposition: attachment; filename=$fileName.$ext");
-}
-
-
-?>
-
+<!doctype html>
 <html>
 	<head>
-		<title><?php anth_the_project_title(true); ?></title>
+		<title><?php echo $api->project->post_title; ?></title>
 	</head>
 
 	<body>
-	<h1><?php anth_the_project_title(); ?></h1>
+		<h1><?php echo $api->project->post_title; ?></h1>
 
-	<?php anth_section('front'); ?>
+		<?php foreach($api->parts as $part): ?>
 
-	<?php while ( anth_parts() ): ?>
+			<h2><?php echo $part->post_title; ?></h2>
+			<?php foreach($api->posts($part->ID) as $post): ?>
+				<h3><?php echo $post->post_title; ?></h3>
 
-		<?php anth_part(); ?>
-
-		<?php while ( anth_part_items() ): ?>
-
-			<?php anth_item(); ?>
-			<h2><?php anth_the_title(); ?></h2>
-			<?php anth_the_item_content(); ?>
-		<?php endwhile; ?>
-	<?php endwhile; ?>
-
+				<?php echo $post->post_content; ?>
+			<?php endforeach; ?>
+		<?php endforeach; ?>
 
 	<?php
 
@@ -127,4 +78,3 @@ if( isset($ops['outputParams']['download']) ) {
 	</body>
 
 </html>
-<?php die(); ?>
