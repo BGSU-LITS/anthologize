@@ -11,7 +11,7 @@
 
 	<div id="project-actions">
 		<a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $project->ID ?>"><?php _e( 'Project Details', 'anthologize' ) ?></a> |
-		<a target="_blank" href="admin.php?page=anthologize&action=preview&project_id=<?php echo $project->ID; ?>"><?php _e( 'Preview Project', 'anthologize' ) ?></a> |
+		<a target="_blank" href="admin.php?page=anthologize&action=preview&post_type=anth_project&project_id=<?php echo $project->ID; ?>"><?php _e( 'Preview Project', 'anthologize' ) ?></a> |
 		<a href="admin.php?page=anthologize&action=delete&noheader=true&project_id=<?php echo $project->ID ?>" class="confirm-delete"><?php _e( 'Delete Project', 'anthologize' ) ?></a>
 	</div>
 

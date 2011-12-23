@@ -498,8 +498,8 @@ class Anthologize_Wordpress
 
 		$return = true;
 
-		if ( isset( $_GET['anth_preview'] ) ) {
-			load_template( dirname(__FILE__) . '/templates/html_preview/preview.php' );
+		if ( isset($_GET['action']) AND $_GET['action'] === "preview" ) {
+			load_template( ANTHOLOGIZE . 'templates/html_preview/preview.php' );
 			die();
 		}
 

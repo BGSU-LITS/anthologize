@@ -17,8 +17,7 @@ if ( have_posts() ) { while ( have_posts() ) { the_post();
 	$preview_title = get_the_title();
 } }
 
-?>
-
+?><!doctype html>
 <html>
 <head>
 	<?php if ( have_posts() ) : ?>
