@@ -38,7 +38,9 @@ class Controller_Ajax_WP extends Controller_Ajax
 	 */
     public function before()
 	{
-		$id = isset($_POST['project_id']) ? $_POST['project_id'] : false;
+		parent::before();
+
+		$id = $this->param('project_id', false);
 		if ($id !== false)
 		{
 			$this->project = Anthologize_Project::get($id);

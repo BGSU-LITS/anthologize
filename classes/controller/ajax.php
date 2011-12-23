@@ -12,11 +12,11 @@ class Controller_Ajax extends Controller
 	 * @var   string   The controller action to run
 	 */
 	protected $action = "";
-	
+
 	/**
-	 * Ajax is done really funky in wp....
+	 * Sets some default variables
 	 */
-	public function __construct()
+	public function before()
 	{
 		$this->action = $_REQUEST['action'];
 		unset($_REQUEST['action']);
