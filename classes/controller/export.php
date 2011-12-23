@@ -98,7 +98,8 @@ class Controller_Export extends Controller
 	{
 		$this->update($_POST);
 
-		$this->content = var_dump(self::get_metadata($_POST['project_id']));
+		$api = new Anthologize_API($_POST['project_id']);
+		$this->content = $api->render();
 	}
 
 	/**
