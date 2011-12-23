@@ -253,7 +253,10 @@ class Anthologize_Project {
 	 */
 	protected function create()
 	{
-		wp_insert_post($this->_data);
+		$post_id =  wp_insert_post($this->_data);
+		$this->_data['ID'] = $post_id;
+
+		$this->update_metadata();
 	}
 
 	/**
