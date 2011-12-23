@@ -161,32 +161,16 @@ jQuery(document).ready( function() {
 			dataType:'json',
 			data: {action:'get_project_meta',proj_id:proj_id},
 			success: function(response){
-				var meta = j.parseJSON(response);
+				// Loop through the fields and set them
+				var ids = ['cyear','cname','cctype','edition','authors'];
 
-				if ( meta['cctype'] )
-					j('#cctype').val(meta['cctype']);
-				else
-					j('#cctype').val('by');
-				if ( meta['authors'] )
-					j('#authors').val(meta['authors']);
-				else
-					j('#authors').val('');
-
-
-
-				var inputs = j('#export-form').find('input');
-				j.each(inputs, function( index, input ) {
-					var theid = j(input).attr('id');
-
-					if ( theid == 'export-step' || theid == 'submit' )
-						return true;
-
-					if ( meta[theid] )
-						j(input).val(meta[theid]);
-					else
-						j(input).val('');
+				for (var i = 0, len = ids.length; i < len; i += 1){
+					j("#"+ids[i]).val(response[ids[i]]);
 				}
-			)},
+
+				// Click the right cc type
+				j("#ctype[value="+response.ctype+"]").click();
+			},
 			complete: function(){
 				j.unblockUI();
 			}

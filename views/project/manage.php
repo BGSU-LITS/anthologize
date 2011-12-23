@@ -207,7 +207,7 @@
 
 			</div> <!-- #anthologize-part-box -->
 
-		<div class="button" id="export-project-button"><a href="admin.php?page=anthologize&action=export&project_id=<?php echo $project->ID ?>" id="export-project"><?php _e( 'Export Project', 'anthologize' ) ?></a></div>
+		<div class="button" id="export-project-button"><a href="admin.php?page=anthologize/export&project_id=<?php echo $project->ID ?>" id="export-project"><?php _e( 'Export Project', 'anthologize' ) ?></a></div>
 
 		</div> <!-- #project-organizer-right-column -->
 

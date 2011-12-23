@@ -172,6 +172,16 @@ class Controller_Ajax_WP extends Controller_Ajax
 		);
     }
 
+	/**
+	 * Gets the metadata for a project
+	 */
+	public function get_project_meta()
+	{
+		$id = $this->param('proj_id');
+
+		$this->content = Controller_Export::get_metadata($id);
+	}
+
     function fetch_tags() {
         $tags = get_tags();
 

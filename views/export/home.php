@@ -28,7 +28,7 @@
 		<table class="form-table">
 			<tr valign="top">
 				<th scope="row"><?php _e( 'Year', 'anthologize' ) ?></th>
-				<td><input type="text" id="cyear" name="cyear" value="<?php echo $cdate ?>"/></td>
+				<td><input type="text" id="cyear" name="cyear" value="<?php echo $cyear ?>"/></td>
 			</tr>
 
 			<tr valign="top">
@@ -65,7 +65,7 @@
 		</table>
 
 		<input type="hidden" id="export-step" name="export-step" value="1" />
-		<div class="anthologize-button" id="export-next"><input type="submit" name="submit" id="submit" value="<?php _e( 'Next', 'anthologize' ) ?>" /></div>
+		<div class="anthologize-button" id="export-next"><input type="submit" id="submit" value="<?php _e( 'Next', 'anthologize' ) ?>" /></div>
 
 		</form>
 	</div>

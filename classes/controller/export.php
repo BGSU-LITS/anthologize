@@ -19,10 +19,23 @@ class Controller_Export extends Controller
 		$data = array(
 			'projects' => $this->get_projects(),
 			'project_id' => $project_id,
-			'action' => "admin.php?page=anthologize/export",
+			'action' => "admin.php?page=anthologize/export&noheader=true",
 		);
 
-		$this->content = Anthologize::render("export/home", array_merge($data, $this->get_metadata($project_id)));
+		$this->content = Anthologize::render("export/home", array_merge($data, self::get_metadata($project_id)));
+	}
+
+	/**
+	 * Posting to the home screen
+	 */
+	public function action_post_index()
+	{
+		$project_id = $_POST['project_id'];
+
+		$meta = array_merge(self::get_metadata($project_id), $_POST);
+		update_post_meta( $project_id, 'anthologize_meta', $meta );
+
+		Anthologize::redirect("admin.php?page=anthologize/export&action=step2");
 	}
 
 	/**
@@ -31,15 +44,12 @@ class Controller_Export extends Controller
 	 * @param  int  $id   The project id
 	 * @return array 
 	 */
-	protected function get_metadata($id)
+	public static function get_metadata($id)
 	{
-		if ($id === false)
-		{
-			$meta = ($id === false) ? array() : get_post_meta($id, 'anthologize_meta', true );
-		}
+		$meta = ($id === false) ? array() : get_post_meta($id, 'anthologize_meta', true );
 
 		$defaults = array(
-			'cdate' => date("Y"),
+			'cyear' => date("Y"),
 			'cname' => isset($meta['author_name']) ? isset($meta['author_name']) : "",
 			'ctype' => "cc",
 			'cctype' => "by",
@@ -52,19 +62,11 @@ class Controller_Export extends Controller
 		return array_merge($defaults, $meta);
 	}
 
-	public function action_get_step1()
-	{
-		
-	}
-
 	public function action_get_step2()
 	{
 		
 	}
 
-	/**
-	 * The actual saving step
-	 */
 	public function action_get_step3()
 	{
 		/*
@@ -73,34 +75,6 @@ class Controller_Export extends Controller
 		 * send a file to the user, and die. If someone ends up here, it means
 		 * that something has gone awry.
 		 */
-	}
-	var $project_id;
-
-	/**
-	 * The export panel. We are the champions, my friends
-	 */
-	function anthologize_export_panel () {
-
-		
-		
-		
-		$this->projects = $this->get_projects();
-
-		if ( !isset( $project_id ) ) {
-			if ( isset( $_GET['project_id'] ) ) {
-				$project_id = $_GET['project_id'];
-			} else {
-				$keys = array_keys( $this->projects, current( $this->projects ) );
-				$project_id = $keys[0];
-			}
-		}
-
-		$this->project_id = $project_id;
-		
-		$export_step = ( isset( $_POST['export-step'] ) ) ? $_POST['export-step'] : '1';
-		
-		if ( $export_step != '3' )
-			$this->display();
 	}
 	
 	function export_format_options_title() {
