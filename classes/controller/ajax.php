@@ -38,6 +38,7 @@ class Controller_Ajax extends Controller
 	 */
 	public function after()
 	{
+		header('Content-Type: application/json', true);
 		echo $this->content !== null ?
 			json_encode($this->content) :
 			"";
