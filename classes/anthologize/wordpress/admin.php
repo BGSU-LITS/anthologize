@@ -22,7 +22,7 @@ class Anthologize_Wordpress_Admin {
 		add_action( 'admin_init', array ( $this, 'init' ) );
 		add_action( 'admin_menu', array( $this, 'dashboard_hooks' ), 990 );
 		add_action( 'admin_notices', array( $this, 'version_nag' ) );
-		
+
 		if ( is_multisite() ) {
 			add_action( 'wpmu_options', array( $this, 'ms_settings' ) );
 			add_action( 'update_wpmu_options', array( $this, 'save_ms_settings' ) );
@@ -36,6 +36,10 @@ class Anthologize_Wordpress_Admin {
 		foreach ( array('anth_project', 'anth_part', 'anth_library_item', 'anth_imported_item') as $type ) {
 			add_meta_box('anthologize', __( 'Anthologize', 'anthologize' ), array($this,'item_meta_box'), $type, 'side', 'high');
 			add_meta_box('anthologize-save', __( 'Save', 'anthologize' ), array($this,'meta_save_box'), $type, 'side', 'high');
+
+			// Register the redirect when a post is edited
+			add_filter( 'redirect_post_location', array( $this, 'item_meta_redirect' ) );
+
 			remove_meta_box( 'submitdiv' , $type , 'normal' );
 		}
 
@@ -283,9 +287,6 @@ class Anthologize_Wordpress_Admin {
 		update_post_meta( $post_id,'anthologize_meta', $anthologize_meta );
 		update_post_meta( $post_id, 'author_name', $new_data['author_name'] );
 		
-		// We need to filter the redirect location when Anthologize items are saved
-		add_filter( 'redirect_post_location', array( $this, 'item_meta_redirect' ) );
-		
 		return $post_id;
 	}
 
@@ -295,28 +296,20 @@ class Anthologize_Wordpress_Admin {
 	 * @package Anthologize
 	 * @since 0.3
 	 *
-	 * @param str $location
-	 * @retur str $location
+	 * @param  string   $location   The default location
+	 * @return string               URL to redirect to
 	 */
 	public function item_meta_redirect($location) {
-		if ( isset( $_POST['post_parent'] ) ) {
-			$post_parent_id = $_POST['post_parent'];
-		} else {
-			$post = get_post( $_POST['ID'] );
-			$post_parent_id = $post->post_parent;
+		if (isset($_POST['return_to_project']))
+		{
+			$location = add_query_arg( array(
+				'page'	     => 'anthologize',
+				'action'     => 'manage',
+				'project_id' => $_POST['return_to_project']
+			), admin_url( 'admin.php' ) );
 		}
 
-    	$post_parent = get_post( $post_parent_id );
-
-		$arg = isset($_POST['new_part']) ?
-			$_POST['parent_id'] :
-			$post_parent->post_parent;
-
-		return add_query_arg( array(
-			'page'	     => 'anthologize',
-			'action'     => 'manage',
-			'project_id' => $arg
-		), admin_url( 'admin.php' ) );
+		return $location;
     }
 
     /**
