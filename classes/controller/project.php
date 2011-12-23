@@ -20,29 +20,6 @@ class Controller_Project extends Controller {
 	}
 
 	/**
-	 * Creates a new project
-	 */
-	public function action_get_create()
-	{
-		$this->content = Anthologize::render("project/form", array(
-			'project' => NULL,
-			'title' => __( 'Add New Project', 'anthologize' ),
-			'action' => get_admin_url() . "admin.php?page=anthologize&action=create&noheader=true"
-		));
-	}
-
-	/**
-	 * Actually create the post
-	 */
-	public function action_post_create()
-	{
-		$project = new Anthologize_Project($_POST);
-		$project->save();
-
-		wp_redirect( get_admin_url() . 'admin.php?page=anthologize&project_saved=1' );
-	}
-
-	/**
 	 * Pulls up a project to be edited.
 	 */
 	public function action_get_edit()
@@ -116,6 +93,8 @@ class Controller_Project extends Controller {
 
 	/**
 	 * Handles when the mange form has been posted
+	 *
+	 * @todo  finish this (but only when scripts are turned off...)
 	 */
 	public function action_post_manage()
 	{
@@ -159,6 +138,14 @@ class Controller_Project extends Controller {
 		}
 
 		Anthologize::redirect(get_admin_url().'admin.php?page=anthologize');
+	}
+
+	/**
+	 * Project exporting
+	 */
+	public function action_get_export()
+	{
+		$this->content = "Exportation!";
 	}
 
 	/**

@@ -19,7 +19,7 @@ class Controller_Import extends Controller {
 	public function action_get_index()
 	{
 		$this->content = Anthologize::render("import/form", array(
-			'action' => get_admin_url()."admin.php?page=anthologize&controller=import",
+			'action' => get_admin_url()."admin.php?page=anthologize/import",
 			'message' => $this->message
 		));
 	}
@@ -51,7 +51,7 @@ class Controller_Import extends Controller {
 
 		$this->content = Anthologize::render("import/select", array(
 			'items' => $this->fetch_items($rss),
-			'action' => get_admin_url()."admin.php?page=anthologize&controller=import&action=import",
+			'action' => get_admin_url()."admin.php?page=anthologize/import&action=import",
 		));
 	}
 

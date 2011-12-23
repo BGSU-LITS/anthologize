@@ -32,7 +32,7 @@ class Controller_Settings extends Controller {
 	public function action_get_index()
 	{
 		$this->content = Anthologize::render("settings", array(
-			'action' => get_admin_url() . "admin.php?page=anthologize&controller=settings&noheader=true",
+			'action' => get_admin_url() . "admin.php?page=anthologize/settings&noheader=true",
 			'forbid_local_caps' => $this->forbid_local_caps(),
 			'minimum_cap' => $this->minimum_cap(),
 			'message' => $this->param('saved', false)
@@ -49,7 +49,7 @@ class Controller_Settings extends Controller {
 		$anth_settings = !empty( $_POST['anth_settings'] ) ? $_POST['anth_settings'] : array();
 		update_option( 'anth_settings', $anth_settings );
 
-		Anthologize::redirect(get_admin_url().'admin.php?page=anthologize&controller=settings&saved=1');
+		Anthologize::redirect(get_admin_url().'admin.php?page=anthologize/settings&saved=1');
 	}
 
 	/**

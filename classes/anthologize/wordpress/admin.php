@@ -121,16 +121,16 @@ class Anthologize_Wordpress_Admin {
 			'menu_title' => __( 'Anthologize', 'anthologize' ),
 			'page_title' => __( 'Anthologize', 'anthologize' ),
 			'access_level' => $this->minimum_cap, 'file' => 'anthologize',
-			'function' => array( "Anthologize", 'render' ),
+			'function' => array( "Anthologize", 'router' ),
 			'position' => $default_index
 		) );
 		
 		// Creates the submenu items
 		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'My Projects', 'anthologize' ), __( 'My Projects','anthologize' ), $this->minimum_cap, 'anthologize', array ("Anthologize", 'router') );
-		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'New Project','anthologize' ), __('New Project','anthologize'), $this->minimum_cap, 'anthologize&action=create', array ("Anthologize", 'router'));
-		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'Export Project', 'anthologize' ), __( 'Export Project', 'anthologize' ), $this->minimum_cap, 'anthologize&action=export', array ("Anthologize", 'router') );
-		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'Import Content', 'anthologize' ), __( 'Import Content', 'anthologize' ), $this->minimum_cap, 'anthologize&controller=import', array ("Anthologize", 'router') );
-		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'Settings', 'anthologize' ), __( 'Settings', 'anthologize' ), $this->minimum_cap, 'anthologize&controller=settings', array ("Anthologize", 'router'));
+		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'New Project','anthologize' ), __('New Project','anthologize'), $this->minimum_cap, 'anthologize/create', array ("Anthologize", 'router'));
+		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'Export Project', 'anthologize' ), __( 'Export Project', 'anthologize' ), $this->minimum_cap, 'anthologize/export', array ("Anthologize", 'router') );
+		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'Import Content', 'anthologize' ), __( 'Import Content', 'anthologize' ), $this->minimum_cap, 'anthologize/import', array ("Anthologize", 'router') );
+		$plugin_pages[] = add_submenu_page( 'anthologize', __( 'Settings', 'anthologize' ), __( 'Settings', 'anthologize' ), $this->minimum_cap, 'anthologize/settings', array ("Anthologize", 'router'));
 		
 		foreach ( $plugin_pages as $plugin_page ) {
 			add_action( "admin_print_styles", array( $this, 'load_styles' ) );

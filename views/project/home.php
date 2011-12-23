@@ -1,6 +1,6 @@
 <div class="wrap anthologize">
 	<div id="anthologize-logo"><img src="<?php echo WP_PLUGIN_URL . '/anthologize/images/anthologize-logo.gif' ?>" /></div>
-	<h2><?php _e( 'My Projects', 'anthologize' ) ?> <a href="admin.php?page=anthologize&action=create" class="button add-new-h2"><?php _e( 'Add New', 'anthologize' ) ?></a></h2>
+	<h2><?php _e( 'My Projects', 'anthologize' ) ?> <a href="admin.php?page=anthologize/create" class="button add-new-h2"><?php _e( 'Add New', 'anthologize' ) ?></a></h2>
 
 <?php if ($project_saved) : ?>
 	<div id="message" class="updated fade">

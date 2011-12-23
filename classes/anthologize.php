@@ -34,20 +34,18 @@ class Anthologize
 	 */
 	public static function router()
 	{
-		$defaults = array(
-			'page' => "anthologize",
-			'controller' => "project",
-			'action' => "index"
-		);
+		$route = explode("/", $_GET['page']);
 
-		$route = array_merge($defaults, array_intersect_key($_GET, $defaults));
+		$controller = isset($route[1]) ? $route[1] : "project";
+		$action = isset($_GET['action']) ? $_GET['action'] : "index";
 
 		// Execute the request
-		$class = "Controller_{$route['controller']}";
+		$class = "Controller_{$controller}";
 		$class = new $class;
-		$class->set_params(array_diff_assoc($_GET, $route)); // Setting additional route params
+		unset($_GET['page'], $_GET['action']); // Pull of the page and action params...
+		$class->set_params($_GET); // Setting additional route params
 
-		$action = "action_".strtolower($_SERVER['REQUEST_METHOD'])."_".$route['action'];
+		$action = "action_".strtolower($_SERVER['REQUEST_METHOD'])."_".$action;
 
 		$class->before();
 		$class->$action();
