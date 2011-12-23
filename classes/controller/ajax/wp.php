@@ -29,8 +29,6 @@ class Controller_Ajax_WP extends Controller_Ajax
 		add_action( 'wp_ajax_include_comments', array( $this, 'run' ) );
 		add_action( 'wp_ajax_include_all_comments', array( $this, 'run' ) );
 		add_action( 'wp_ajax_remove_post', array( $this, 'run' ) );
-
-		parent::__construct();
 	}
 
 	/**
