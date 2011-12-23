@@ -488,44 +488,13 @@ class Anthologize_Wordpress
 	}
 
 	/**
-	 * Load the anthologize template.
-	 *
-	 * @global type $anthologize_formats
-	 * @return type 
+	 * Catches a preview request and jumps out of the wordpress template.
 	 */
 	function load_template() {
-		global $anthologize_formats;
-
-		$return = true;
-
 		if ( isset($_GET['action']) AND $_GET['action'] === "preview" ) {
 			load_template( ANTHOLOGIZE . 'templates/html_preview/preview.php' );
 			die();
 		}
-
-		if ( isset( $_POST['export-step'] ) ) {
-			if ( $_POST['export-step'] == 3 )
-				$return = false;
-		}
-
-		if ( $return )
-			return;
-
-		anthologize_save_project_meta();
-
-		require_once Anthologize::find_file("includes", 'class-export-panel');
-		Anthologize_Export_Panel::save_session();
-
-		$type = $_SESSION['filetype'];
-
-		if ( !is_array( $anthologize_formats[$type] ) )
-			return;
-
-		$project_id = $_SESSION['project_id'];
-
-		load_template( $anthologize_formats[$type]['loader-path'] );
-
-		return false;
 	}
 
 	/**

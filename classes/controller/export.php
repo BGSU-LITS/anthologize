@@ -8,7 +8,6 @@
  */
 class Controller_Export extends Controller
 {
-
 	/**
 	 * The home screen
 	 */
@@ -30,12 +29,76 @@ class Controller_Export extends Controller
 	 */
 	public function action_post_index()
 	{
-		$project_id = $_POST['project_id'];
+		$this->update($_POST, 2);
+	}
 
-		$meta = array_merge(self::get_metadata($project_id), $_POST);
-		update_post_meta( $project_id, 'anthologize_meta', $meta );
+	/**
+	 * Step 2
+	 *
+	 * Set the project title, dedication, acknolwedgements and output format
+	 */
+	public function action_get_step2()
+	{
+		global $anthologize_formats;
 
-		Anthologize::redirect("admin.php?page=anthologize/export&action=step2");
+		$id = $this->param('project_id');
+		$meta = self::get_metadata($id);
+
+		$this->content = Anthologize::render('export/step2', array(
+			'project_id' => $id,
+			'project' => get_post($id),
+			'action' => "admin.php?page=anthologize/export&action=step2&noheader=true",
+			'dedication' => $meta['dedication'],
+			'acknowledgements' => $meta['acknowledgements'],
+			'filetype' => $meta['filetype'],
+			'formats' => $anthologize_formats,
+		));
+
+		do_action( 'anthologize_export_format_list' );
+	}
+
+	/**
+	 * Saves the step 2 panel
+	 */
+	public function action_post_step2()
+	{
+		$this->update($_POST, 3);
+	}
+
+	/**
+	 * Step 3
+	 *
+	 * Sets the final options before outputting the results
+	 */
+	public function action_get_step3()
+	{
+		global $anthologize_formats;
+
+		$id = $this->param('project_id');
+		$meta = self::get_metadata($id);
+
+		$format = $anthologize_formats[$meta['filetype']];
+		$label = $format['label'];
+
+		unset($format['label'], $format['loader-path']);
+
+		$this->content = Anthologize::render('export/step3', array(
+			'project_id' => $id,
+			'project' => get_post($id),
+			'action' => "admin.php?page=anthologize/export&action=step3",
+			'format' => $format,
+			'format_title' => sprintf( __( '%s Publishing Options', 'anthologize' ), $label),
+		));
+	}
+
+	/**
+	 * Here is where all the magic happens!!
+	 */
+	public function action_post_step3()
+	{
+		$this->update($_POST);
+
+		$this->content = var_dump(self::get_metadata($_POST['project_id']));
 	}
 
 	/**
@@ -56,162 +119,32 @@ class Controller_Export extends Controller
 			'edition' => "",
 			'authors' => isset($meta['author_name']) ? $meta['author_name'] : "",
 			'dedication' => "",
-			'acknowledgements' => ""
+			'acknowledgements' => "",
+			'filetype' => 'tei',
+			'do-shortcodes' => 1
 		);
 
 		return array_merge($defaults, $meta);
 	}
 
-	public function action_get_step2()
+	/**
+	 * Updates the metadata for a post.
+	 *
+	 * @param array  $data        Metadata data
+	 * @param int    $step        The step to send the user to (If null, then no redirect)
+	 */
+	protected function update($data, $step = null)
 	{
-		
-	}
+		$project_id = $_POST['project_id'];
+		unset($data['project_id']);
 
-	public function action_get_step3()
-	{
-		/*
-		 * You should never actually get to this point.
-		 * Method load_template() in anthologize.php should grab all requests with $_POST['filetype'],
-		 * send a file to the user, and die. If someone ends up here, it means
-		 * that something has gone awry.
-		 */
-	}
-	
-	function export_format_options_title() {
-		global $anthologize_formats;
-		
-		$format = $_SESSION['filetype'];
-	
-		$title = sprintf( __( '%s Publishing Options', 'anthologize' ), $anthologize_formats[$format]['label'] );
-		
-		echo $title;
-	}
+		$meta = array_merge(self::get_metadata($project_id), $data);
+		update_post_meta( $project_id, 'anthologize_meta', $meta );
 
-	function save_session() {
-		
-		if ( $_POST['export-step'] == '2' )
-			$_SESSION['outputParams'] = array( 'format' => $_POST['filetype'] );
-		
-		// outputParams need to be reset at step 3 so that
-		// on a refresh null values will overwrite
-		if ( $_POST['export-step'] == '3' ) {
-			// filetype has been set different ways in different versions
-			// This is to be safe
-			$filetype = isset( $_SESSION['outputParams']['filetype'] ) ? $_SESSION['outputParams']['filetype'] : $_SESSION['filetype'];
-			$_SESSION['outputParams'] = array( 'format' => $filetype );
-		}		
-		
-		
-		foreach ( $_POST as $key => $value ) {
-			if ( $key == 'submit' || $key == 'export-step' )
-				continue;
-		
-			if ( $key == '' )
-				echo "OK";
-			
-			if ( $_POST['export-step'] == '3' )
-				$_SESSION['outputParams'][$key] = stripslashes( $value );
-			else
-				$_SESSION[$key] = stripslashes( $value );
-		
+		if ($step !== null)
+		{
+			Anthologize::redirect("admin.php?page=anthologize/export&action=step{$step}&project_id={$project_id}");
 		}
-	
-	}
-	
-	function export_format_list() { 
-		global $anthologize_formats;
-	?>
-		<?php foreach( $anthologize_formats as $name => $fdata ) : ?>
-		
-			<input type="radio" name="filetype" value="<?php echo $name ?>" /> <?php echo $fdata['label'] ?><br />
-					
-		<?php endforeach; ?>
-	
-		<?php do_action( 'anthologize_export_format_list' ) ?>
-
-	<?php
-	}
-	
-	function render_format_options() {
-		global $anthologize_formats;
-		
-		$format = $_SESSION['filetype'];
-		
-		if ( $fdata = $anthologize_formats[$format] ) {
-			$return = '';
-			foreach( $fdata as $oname => $odata ) {
-			
-				if ( $oname == 'label' || $oname == 'loader-path' )
-					continue;
-				
-				if ( !$odata )
-					continue;
-				
-				$default = ( isset( $odata['default'] ) ) ? $odata['default'] : false;
-				
-				$return .= '<div class="export-options-box">'; 
-		
-				$return .= '<div class="pub-options-title">' . $odata['label'] . '</div>';
-				
-				switch( $odata['type'] ) {
-					case 'checkbox':
-						$return .= $this->build_checkbox( $oname, $odata['label'] );
-						break;
-					
-					case 'dropdown':
-						$return .= $this->build_dropdown( $oname, $odata['label'], $odata['values'], $default );
-						break;
-						
-					// Default is a textbox
-					default:
-						$return .= $this->build_textbox( $oname, $odata['label'] );
-						break;
-				}
-				
-				$return .= '</div>';
-				
-			}
-		} else {
-			$return = __( 'This appears to be an invalid export format. Please try again.', 'anthologize' );
-		}
-					
-		echo $return;
-	}
-
-	function build_checkbox( $name, $label ) {
-		
-		$html = '<input name="' . $name . '" id="' . $name .'" type="checkbox">';
-		
-		return apply_filters( 'anthologize_build_checkbox', $html, $name, $label );
-	}
-
-	function build_dropdown( $name, $label, $options, $default ) {
-		// $name is the input name (no spaces, eg 'page-size')
-		// $label is the input label (for display, eg 'Page Size'. Should be internationalizable, eg __('Page Size', 'anthologize')
-		// $options is associative array where keys are option values and values are the text displayed in the option field.
-		// $default is the default option
-						
-		$html = '<select name="' . $name . '">';
-		
-		foreach( $options as $ovalue => $olabel ) {
-			$html .= '<option value="' . $ovalue . '"';
-			
-			if ( $default == $ovalue )
-				$html .= ' selected="selected"';
-						
-			$html .= '>' . $olabel . '</option>';
-		}	
-		
-		$html .= '</select>';
-		
-		return apply_filters( 'anthologize_build_dropdown', $html, $name, $label, $options );
-	}
-	
-	function build_textbox( $name, $label ) {
-					
-		$html = '<input name="' . $name . '" id="' . $name . '" type="text">';
-		
-		return apply_filters( 'anthologize_build_textbox', $html, $name, $label );
 	}
 
 	/**
