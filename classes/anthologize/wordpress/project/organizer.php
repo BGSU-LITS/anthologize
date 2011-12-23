@@ -212,54 +212,6 @@ class Anthologize_Wordpress_Project_Organizer {
 		return true;
 	}
 
-	function append_children( $append_parent, $append_children ) {
-
-		$parent_post = get_post( $append_parent );
-		$pp_content = $parent_post->post_content;
-
-		if ( !$author_name = get_post_meta( $append_parent, 'author_name', true ) )
-			$author_name = '';
-
-		if ( !$author_name_array = get_post_meta( $append_parent, 'author_name_array', true ) )
-			$author_name_array = array();
-
-		foreach( $append_children as $append_child ) {
-			$child_post = get_post( $append_child );
-
-			$cp_title = '<h2 class="anthologize-item-header">' . $child_post->post_title . '</h2>
-			';
-
-			$cp_content = $child_post->post_content;
-
-			$pp_content .= $cp_title . $cp_content . '
-			';
-
-			if ( $author_name != '' )
-				$author_name .= ', ';
-
-			$cp_author_name = get_post_meta( $append_child, 'author_name', true );
-			$author_name .= $cp_author_name;
-			$author_name_array[] = $cp_author_name;
-
-			wp_delete_post( $append_child );
-		}
-
-		$args = array(
-			'ID' => $append_parent,
-			'post_content' => $pp_content,
-		);
-
-		if ( !wp_update_post( $args ) )
-			return false;
-
-		update_post_meta( $append_parent, 'author_name', $author_name );
-		update_post_meta( $append_parent, 'author_name_array', $author_name_array );
-
-		$this->update_project_modified_date();
-
-		return true;
-	}
-
 	function display_item( $append_parent ) {
 		global $post;
 		

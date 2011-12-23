@@ -471,6 +471,7 @@ jQuery(document).ready(function(){
                       message: jQuery('#blockUISpinner').show() });
 
 	  var item = jQuery(this).closest("li.item");
+	  var part = jQuery(this).closest("li.part")[0].id.replace("part-", "");
 	  var append_items = {};
 	  var merge_seq = {};
 	  var i = 0;
@@ -497,7 +498,7 @@ jQuery(document).ready(function(){
 	  });
 	  var project_id = anthologize.getProjectId();
 	  var post_id = anthologize.cleanPostIds(item.attr("id"));
-	  anth_admin_ajax.merge_items({"project_id":project_id, "post_id":post_id, "child_post_ids":append_items, "merge_seq": merge_seq});
+	  anth_admin_ajax.merge_items({"project_id":project_id, "part_id": part, "post_id":post_id, "child_post_ids":append_items, "merge_seq": merge_seq});
   });
 
   jQuery("body").delegate("input.select-comment", "change", function(){

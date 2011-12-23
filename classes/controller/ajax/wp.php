@@ -138,6 +138,40 @@ class Controller_Ajax_WP extends Controller_Ajax
 		$this->content = apply_filters( 'anth_get_posts_by', $the_posts, $filterby );
 	}
 
+	/**
+	 * Merges items into 1 post
+	 */
+	public function merge_items() {
+        $post_id = $this->param('post_id');
+
+		$child_post_ids = $this->param('child_post_ids');
+		if ( ! is_array($child_post_ids))
+		{
+			$child_post_ids = array($child_post_ids);
+		}
+
+        $new_seq = stripslashes($this->param('new_seq'));
+
+        $new_seq_array = json_decode($new_seq, true);
+        if ( NULL === $new_seq_array ) {
+            header('HTTP/1.1 500 Internal Server Error');
+            die();
+        }
+
+        $append_result = $this->project->append_children($post_id, $child_post_ids);
+
+        if (false === $append_result) {
+            header('HTTP/1.1 500 Internal Server Error');
+            die();
+        }
+
+        $reseq_result = Anthologize_Project::rearrange_items($this->param('part_id'), $new_seq_array);
+
+		$this->content = array(
+			'success' => $reseq_result
+		);
+    }
+
     function fetch_tags() {
         $tags = get_tags();
 
@@ -279,40 +313,6 @@ class Controller_Ajax_WP extends Controller_Ajax
 		print json_encode( $ret_ids );
 		die();
 	}
-
-    function merge_items() {
-        $project_id = $_POST['project_id'];
-        $post_id = $_POST['post_id'];
-
-        if (is_array($_POST['child_post_ids'])) {
-            $child_post_ids = $_POST['child_post_ids'];
-        } else {
-            $child_post_ids = Array($_POST['child_post_ids']);
-        }
-
-        $new_seq = stripslashes($_POST['new_seq']);
-
-        $new_seq_array = json_decode($new_seq, $assoc=true);
-        if ( NULL === $new_seq_array ) {
-            header('HTTP/1.1 500 Internal Server Error');
-            die();
-        }
-
-        $append_result = $this->project_organizer->append_children($post_id, $child_post_ids);
-
-        if (false === $append_result) {
-            header('HTTP/1.1 500 Internal Server Error');
-            die();
-        }
-
-        $reseq_result = $this->project_organizer->rearrange_items($new_seq_array);
-
-        // TODO: What to do? If the merge succeeded but the resort failed, ugh...
-        /*if (false === $reseq_result) {
-        }*/
-
-        die();
-    }
 
     function fetch_project_meta() {
 		$result = '';

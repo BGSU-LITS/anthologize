@@ -133,9 +133,9 @@ class Anthologize_Project {
 	/**
 	 * Rearranges items in the part
 	 *
-	 * @global type $wpdb
+	 * @global  WPDD  $wpdb
 	 * @param   int   $project_id   The project id to update
-	 * @param type $seq
+	 * @param   array $seq          Array of post ids to rearrange
 	 * @return  boolean
 	 */
 	public static function rearrange_items( $project_id, $seq ) {
@@ -319,6 +319,59 @@ class Anthologize_Project {
 		);
 
 		return query_posts($args);
+	}
+
+	/**
+	 * Adds content into a post
+	 *
+	 * @param   int     $apped_parent   The post id to append to
+	 * @param   array   $append_child   An array of post id's to append to the project
+	 * @return  boolean                 Success
+	 */
+	function append_children( $append_parent, $append_children ) {
+
+		$parent_post = get_post( $append_parent );
+		$pp_content = $parent_post->post_content;
+
+		if ( !$author_name = get_post_meta( $append_parent, 'author_name', true ) )
+			$author_name = '';
+
+		if ( !$author_name_array = get_post_meta( $append_parent, 'author_name_array', true ) )
+			$author_name_array = array();
+
+		foreach( $append_children as $append_child ) {
+			$child_post = get_post( $append_child );
+
+			$cp_title = '<h2 class="anthologize-item-header">' . $child_post->post_title . '</h2>
+			';
+
+			$cp_content = $child_post->post_content;
+
+			$pp_content .= $cp_title . $cp_content . '
+			';
+
+			if ( $author_name != '' )
+				$author_name .= ', ';
+
+			$cp_author_name = get_post_meta( $append_child, 'author_name', true );
+			$author_name .= $cp_author_name;
+			$author_name_array[] = $cp_author_name;
+
+			wp_delete_post( $append_child );
+		}
+
+		$args = array(
+			'ID' => $append_parent,
+			'post_content' => $pp_content,
+		);
+
+		if ( !wp_update_post( $args ) )
+			return false;
+
+		update_post_meta( $append_parent, 'author_name', $author_name );
+		update_post_meta( $append_parent, 'author_name_array', $author_name_array );
+
+		return true;
 	}
 
 }

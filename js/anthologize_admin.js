@@ -84,6 +84,7 @@ var anth_admin_ajax = {
             dataType: 'json',
             data: {action:'merge_items',
                    project_id:config_obj.project_id,
+				   part_id:config_obj.part_id,
                    post_id:config_obj.post_id,
                    child_post_ids:config_obj.child_post_ids,
                    new_seq:seq_stringify(config_obj.merge_seq)},
