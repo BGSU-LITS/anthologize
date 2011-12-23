@@ -6,12 +6,10 @@
  * @package Anthologize
  * @since 0.6
  */
+$post_id = isset($_GET['post_id']) ? $_GET['post_id'] : false;
+$post_type = isset($_GET['post_type']) ? $_GET['post_type'] : false;
 
-
-$post_id   = !empty( $_GET['post_id'] ) ? $_GET['post_id'] : false;
-$post_type = !empty( $_GET['post_type'] ) ? $_GET['post_type'] : false;
-
-query_posts( array( 'p' => $post_id, 'post_type' => $post_type ) );
+query_posts(array('p' => $post_id, 'post_type' => $post_type));
 
 if ( have_posts() ) { while ( have_posts() ) { the_post();
 	$preview_title = get_the_title();

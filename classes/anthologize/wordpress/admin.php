@@ -306,7 +306,7 @@ class Anthologize_Wordpress_Admin {
 				'page'	     => 'anthologize',
 				'action'     => 'manage',
 				'project_id' => $_POST['return_to_project'],
-				'edited'     => 1,
+				'msg'       => isset($_POST['new_part']) ? "Part+Created" : "Post+Saved",
 			), admin_url( 'admin.php' ) );
 		}
 

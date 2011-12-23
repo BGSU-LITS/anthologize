@@ -11,15 +11,15 @@
 
 	<div id="project-actions">
 		<a href="admin.php?page=anthologize&action=edit&project_id=<?php echo $project->ID ?>"><?php _e( 'Project Details', 'anthologize' ) ?></a> |
-		<a target="_blank" href="admin.php?page=anthologize&action=preview&post_type=anth_project&project_id=<?php echo $project->ID; ?>"><?php _e( 'Preview Project', 'anthologize' ) ?></a> |
+		<a target="_blank" href="admin.php?page=anthologize&action=preview&post_type=anth_project&post_id=<?php echo $project->ID; ?>"><?php _e( 'Preview Project', 'anthologize' ) ?></a> |
 		<a href="admin.php?page=anthologize&action=delete&noheader=true&project_id=<?php echo $project->ID ?>" class="confirm-delete"><?php _e( 'Delete Project', 'anthologize' ) ?></a>
 	</div>
 
 	</h2>
 
-	<?php if ( isset( $_GET['edited'] ) ) : ?>
+	<?php if ( isset( $_GET['msg'] ) ) : ?>
 		<div id="message" class="updated below-h2">
-			<p><?php _e( 'Item edited', 'anthologize' ) ?></p>
+			<p><?php _e( $_GET['msg'], 'anthologize' ) ?></p>
 		</div>
 	<?php endif; ?>
 
@@ -88,7 +88,7 @@
 
 			<div class="postbox" id="anthologize-parts-box">
 
-			<div class="handlediv" title="<?php _e( 'Click to toggle', 'anthologize' ) ?>"><br></div><h3 class="hndle"><span><?php _e( 'Parts', 'anthologize' ) ?></span><div class="part-item-buttons button" id="new-part"><a href="post-new.php?post_type=anth_part&project_id=<?php echo $project->ID; ?>&new_part=1"><?php _e( 'New Part', 'anthologize' ) ?></a></div></h3>
+			<div class="handlediv" title="<?php _e( 'Click to toggle', 'anthologize' ) ?>"><br></div><h3 class="hndle"><span><?php _e( 'Parts', 'anthologize' ) ?></span><div class="part-item-buttons button" id="new-part"><a href="post-new.php?post_type=anth_part&project_id=<?php echo $project->ID; ?>&new_part=1&return_to_project=<?php echo $project->ID; ?>"><?php _e( 'New Part', 'anthologize' ) ?></a></div></h3>
 
 			<div id="partlist">
 
