@@ -102,16 +102,16 @@ if( isset($ops['outputParams']['download']) ) {
 				echo "</ul>";
 
 				anth_person_details();
-				anth_person_details('anthologizer');
+				//anth_person_details('anthologizer');
 
 				?>
 				<h3><?php anth_the_title() ?></h3>
 				<div class="item-meta" style="border: 1px solid black; margin: 5px; padding: 5px;">
 
-					<img class="gravatar" src="<?php anth_the_person_gravatar_url(); ?>" />
-					<p class="item-author">By <?php anth_the_person(); ?></p>
-					<p class="item-anthologizer">Anthologized by: <?php anth_the_person('anthologizer'); ?></p>
-					<p class="item-asserted-author">Attributed to: <?php anth_the_person('assertedAuthor'); ?></p>
+					<img class="gravatar" src="<?php //anth_the_person_gravatar_url(); ?>" />
+					<p class="item-author">By <?php //anth_the_person(); ?></p>
+					<p class="item-anthologizer">Anthologized by: <?php //anth_the_person('anthologizer'); ?></p>
+					<p class="item-asserted-author">Attributed to: <?php //anth_the_person('assertedAuthor'); ?></p>
 				</div>
 				<div class="item-content">
 					<?php anth_the_item_content() ?>

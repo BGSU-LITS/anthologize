@@ -85,7 +85,7 @@ class Controller_Export extends Controller
 		$this->content = Anthologize::render('export/step3', array(
 			'project_id' => $id,
 			'project' => get_post($id),
-			'action' => "admin.php?page=anthologize/export&action=step3",
+			'action' => "admin.php?page=anthologize/export&action=step3&noheader=true",
 			'format' => $format,
 			'format_title' => sprintf( __( '%s Publishing Options', 'anthologize' ), $label),
 		));
@@ -96,9 +96,10 @@ class Controller_Export extends Controller
 	 */
 	public function action_post_step3()
 	{
-		$this->update($_POST);
+		$id = $_POST['project_id'];
+		unset($_POST['project_id']);
 
-		$api = new Anthologize_API($_POST['project_id']);
+		$api = new Anthologize_API($id, $_POST);
 		$this->content = $api->render();
 	}
 

@@ -10,6 +10,9 @@ interface Anthologize_Output
 {
 	/**
 	 * Renders the output
+	 *
+	 * @param Anthologize_API_Project $project  The Anthologize project to render
+	 * @param array                   $options  The output options
 	 */
-	public function render(Anthologize_API $api);
+	public function render(Anthologize_API_Project $api, array $options);
 }

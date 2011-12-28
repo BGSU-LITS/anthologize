@@ -12,41 +12,23 @@
 class Anthologize_API
 {
 	/**
-	 * @var  array    The project metadata
+	 * @var Anthologize_API_Project  The project object
 	 */
-	protected $_meta;
+	protected $project;
 
 	/**
-	 * @var int   The project id
+	 * @var array  The output options
 	 */
-	protected $_project_id;
-
-	/**
-	 * @var  stdClass   The project object
-	 */
-	protected $_project;
-
-	/**
-	 * @var  array      All of the projects "parts"
-	 */
-	protected $_parts;
-
-	/**
-	 * @var  array     All of the posts that are associated with this project (in some form...)
-	 */
-	protected $_posts;
+	protected $options;
 
 	/**
 	 * Creates a new API instance
 	 *
-	 * @param   int   $id   The project id
+	 * @param   int   $id       The project id
+	 * @param   array $options  Output options.
 	 */
-	public function __construct($id)
+	public function __construct($id, array $options)
 	{
-		$this->_project_id = $id;
-
-		$this->_meta = get_post_meta($id, 'anthologize_meta', true );
-
 		// Get the project
 		$query = new WP_Query;
 		$project = $query->query(array(
@@ -54,80 +36,37 @@ class Anthologize_API
 			'post_type' => 'anth_project'
 		));
 
-		$this->_project = $project[0]; // Only 1 project...
+		$this->project = new Anthologize_API_Project((array) $project[0]);
 
-		// Now we need the parts
-		$this->_parts = $query->query(array(
-			'post_parent' => $id,
-			'post_type' => 'anth_part',
-		));
-
-		// And finally the posts...
-		foreach ($this->_parts as $part)
+		// Default to HTML output if nothing set
+		if ( ! isset($options['filetype']))
 		{
-			$this->_posts[$part->ID] = $query->query(array(
-				'post_parent' => $part->ID,
-				'post_type' => "anth_library_item"
-			));
+			$options['filetype'] = "html";
 		}
+
+		$this->options = $options;
 	}
 
 	/**
-	 * Gets the metadata array or a property by name.
+	 * Gets the project.
 	 *
-	 * @param  string   $name     The metadata name to get
-	 * @param  mixed    $default  THe default value (if value not found)
-	 * @return mixed
+	 * @return   Anthologize_API_Project
 	 */
-	public function meta($name = null, $default = null)
+	public function project()
 	{
-		if ($name === null)
-		{
-			return $this->_meta;
-		}
-
-		return isset($this->_meta[$name]) ? $this->_meta[$name] : $default;
+		return $this->project;
 	}
 
 	/**
-	 * Gets the posts for this project with the given id.
+	 * Output renderer.
 	 *
-	 * @throws  Exception       If the part id is supplied and not found, then an exception is thrown
-	 * @param   int   $part_id  The part id to find posts for
-	 * @return  array 
-	 */
-	public function posts($part_id)
-	{
-		if ( ! isset($this->_posts[$part_id]))
-		{
-			throw new Exeption("The part id supplied is not included in this project");
-		}
-
-		return $this->_posts[$part_id];
-	}
-
-	/**
-	 * Output renderer
-	 *
-	 * @return  mixed    The output
+	 * @param  array  $options  The output options
 	 */
 	public function render()
 	{
-		$class = "Anthologize_Output_".$this->meta('filetype');
+		$class = "Anthologize_Output_".$this->options['filetype'];
 		$render = new $class;
-		return $render->render($this);
-	}
-
-	/**
-	 * Gets the value of a non-existant property
-	 *
-	 * @param   string   $name   The name of the property to get
-	 * @return  mixed            The value OR null
-	 */
-	public function __get($name)
-	{
-		$under = "_".$name;
-		return isset($this->$under) ? $this->$under : null;
+		return $render->render($this->project, $this->options);
 	}
 
 }

@@ -11,13 +11,28 @@ class Anthologize_Output_HTML implements Anthologize_Output
 	/**
 	 * Gets the output for a html file.
 	 *
-	 * @param  Anthologize_API $api  The anthologize project api
-	 * @return string                The html output
+	 * @param  Anthologize_API_Project $project  The anthologize project
+	 * @param  array                   $options  Rendering options
+	 * @return string                            The html output
 	 */
-	public function render(Anthologize_API $api)
+	public function render(Anthologize_API_Project $project, array $options)
 	{
-		return Anthologize::render("output/html", array(
-			'api' => $api
+		$output = Anthologize::render("output/html", array(
+			'project' => $project,
+			'font_size' => $options['font-size'],
+			'do_shortcodes' => $options['do-shortcodes'] === "1" ? true : false,
 		));
+
+		if (isset($options['download']))
+		{
+			$file = str_replace(" ", "_", $project->title());
+
+			header("Content-type: text/html");
+			header("Content-Disposition: attachment; filename={$file}.html");
+			echo $output;
+			die;
+		}
+
+		return $output;
 	}
 }

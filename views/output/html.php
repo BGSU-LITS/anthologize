@@ -1,80 +1,64 @@
 <!doctype html>
 <html>
 	<head>
-		<title><?php echo $api->project->post_title; ?></title>
+		<title><?php echo $project->title(); ?></title>
+		<style type="text/css">
+			body{ font-size:<?php echo $font_size; ?>px; }
+			h1{ font-size:2em; }
+			h2{ font-size:1.8em; }
+			h3{ font-size:1.6em; }
+		</style>
 	</head>
 
 	<body>
-		<h1><?php echo $api->project->post_title; ?></h1>
+		<h1><?php echo $project->title(); ?></h1>
 
-		<?php foreach($api->parts as $part): ?>
+		<h2>Dedication</h2>
+		<p><?php echo $project->meta('dedication', ""); ?></p>
 
-			<h2><?php echo $part->post_title; ?></h2>
-			<?php foreach($api->posts($part->ID) as $post): ?>
-				<h3><?php echo $post->post_title; ?></h3>
+		<h2>Acknowledgements</h2>
+		<p><?php echo $project->meta('acknowledgements', ""); ?></p>
 
-				<?php echo $post->post_content; ?>
-			<?php endforeach; ?>
+
+<?php foreach ($project->parts() as $part): ?>
+	<?php if (count($part->posts() > 0)): ?>
+		<h2><?php echo $part->title(); ?></h2>
+
+		<?php foreach ($part->posts() as $post): ?>
+		<h3><?php echo $post->title(); ?></h3>
+
+		<?php if (count($post->tags())): ?>
+		<p>Tags</p>
+		<ul>
+		<?php foreach ($post->tags() as $tag): ?>
+			<li><a href=""></a></li>
 		<?php endforeach; ?>
+		</ul>
+		<?php endif; ?>
 
-	<?php
+		<?php if (count($post->categories())): ?>
+		<p>Categories</p>
+		<ul>
+		<?php foreach ($post->categories() as $category): ?>
+			<li><a href="<?php echo get_site_url()."?cat={$category->term_id}"; ?>"><?php echo $category->name; ?></a></li>
+		<?php endforeach; ?>
+		</ul>
+		<?php endif; ?>
 
-	anth_section('body');
-	while ( anth_parts() ) {
+		<div class="item-meta">
+			<img class="gravatar" src="<?php echo $post->gravatar_url(); ?>" />
+			<p class="item-author">By <?php echo $post->author(); ?></p>
+			<p class="item-anthologizer">Anthologized by: <?php $project->anthologizer(); ?></p>
+			<p class="item-asserted-author">Attributed to: <?php $project->asserted_author(); ?></p>
+		</div>
+		<div class="item-content">
+			<?php echo $post->content($do_shortcodes); ?>
+		</div>
 
-		anth_part();
-
-		if ( anth_part_has_items() ) { // Anthologize assumes part_id from context
-
-			?>
-
-			<h2><?php anth_the_title(); ?></h2>
-			<?php
-
-			while( anth_part_items() ) {
-				anth_item();
-				echo "<p>Tags</p><ul>";
-				while( anth_tags() ) {
-					anth_tag_details();
-					echo "<li>";
-					echo "<a href='" . anth_get_the_tag_detail('url') . "'>"  . anth_get_the_tag() . "</a>";
-					echo "</li>";
-				}
-				echo "</ul>";
-
-				echo "<p>Categories</p><ul>";
-				while( anth_categories() ) {
-					anth_category_details();
-					echo "<li>";
-					echo "<a href='" . anth_get_the_category_detail('url') . "'>"  . anth_get_the_category() . "</a>";
-					echo "</li>";
-				}
-				echo "</ul>";
-
-				anth_person_details();
-				anth_person_details('anthologizer');
-
-				?>
-				<h3><?php anth_the_title() ?></h3>
-				<div class="item-meta" style="border: 1px solid black; margin: 5px; padding: 5px;">
-
-					<img class="gravatar" src="<?php anth_the_person_gravatar_url(); ?>" />
-					<p class="item-author">By <?php anth_the_person(); ?></p>
-					<p class="item-anthologizer">Anthologized by: <?php anth_the_person('anthologizer'); ?></p>
-					<p class="item-asserted-author">Attributed to: <?php anth_the_person('assertedAuthor'); ?></p>
-				</div>
-				<div class="item-content">
-					<?php anth_the_item_content() ?>
-				</div>
-
-				<?php
-			}
-		}
-	}
-	?>
-
-
-
+		<!-- TODO: Add Comments -->
+		<?php endforeach; ?>
+	<?php endif; ?>
+<?php endforeach; ?>
 	</body>
 
 </html>
