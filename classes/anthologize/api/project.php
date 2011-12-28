@@ -27,6 +27,8 @@ class Anthologize_API_Project extends Anthologize_API_Content
 			$parts = $query->query(array(
 				'post_parent' => $this->ID,
 				'post_type' => 'anth_part',
+				'orderby' => 'menu_order',
+				'order' => "ASC",
 			));
 
 			foreach ($parts as $row)

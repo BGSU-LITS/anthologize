@@ -27,6 +27,8 @@ class Anthologize_API_Part extends Anthologize_API_Content
 			$posts = $query->query(array(
 				'post_parent' => $this->ID,
 				'post_type' => 'anth_library_item',
+				'orderby' => 'menu_order',
+				'order' => "ASC",
 			));
 
 			foreach ($posts as $row)
