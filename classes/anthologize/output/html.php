@@ -19,6 +19,8 @@ class Anthologize_Output_HTML implements Anthologize_Output
 	{
 		$output = Anthologize::render("output/html", array(
 			'project' => $project,
+			'dedication' => $project->meta('dedication', ""),
+			'acknowledgements' => $project->meta('acknowledgements', ""),
 			'font_size' => $options['font-size'],
 			'do_shortcodes' => $options['do-shortcodes'] === "1" ? true : false,
 		));

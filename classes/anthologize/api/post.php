@@ -6,7 +6,7 @@
  * @author       One Week | One Tool
  * @copyright    Copyright (C) 2010 Center for History and New Media, George Mason University
  */
-class Anthologize_API_Post extends Anthologize_API_Base
+class Anthologize_API_Post extends Anthologize_API_Content
 {
 	/**
 	 * @var  WP_User  The author data
@@ -22,6 +22,11 @@ class Anthologize_API_Post extends Anthologize_API_Base
 	 * @var array  The post categories
 	 */
 	protected $categories = null;
+
+	/**
+	 * @var array  The post comments
+	 */
+	protected $comments = null;
 
 	/**
 	 * Set the author data when createing the object
@@ -44,12 +49,12 @@ class Anthologize_API_Post extends Anthologize_API_Base
 	{
 		$content = $this->get('post_content', "");
 
-		if ($do_shortcodes)
+		if ( ! $do_shortcodes)
 		{
-			$content = do_shortcode($content);
+			remove_filter('the_content', 'do_shortcode', 11);
 		}
 
-		return $content;
+		return apply_filters('the_content', $content);
 	}
 
 	/**
@@ -109,11 +114,40 @@ class Anthologize_API_Post extends Anthologize_API_Base
 			{
 				$categories = array();
 			}
-	
+
 			$this->categories = $categories;
 		}
 
 		return $this->categories;
+	}
+
+	/**
+	 * Gets the comments
+	 *
+	 * @return array
+	 */
+	public function comments()
+	{
+		if ($this->comments === null)
+		{
+			$comments = get_comments(array(
+				'post_id' => $this->meta('original_post_id')
+			));
+
+			$tmp = array();
+			
+			if (is_array($comments))
+			{
+				foreach ($comments as $c)
+				{
+					$tmp[] = new Anthologize_API_Comment((array) $c);
+				}
+			}
+
+			$this->comments = $tmp;
+		}
+
+		return $this->comments;
 	}
 
 }

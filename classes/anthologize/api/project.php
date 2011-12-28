@@ -6,7 +6,7 @@
  * @author       One Week | One Tool
  * @copyright    Copyright (C) 2010 Center for History and New Media, George Mason University
  */
-class Anthologize_API_Project extends Anthologize_API_Base
+class Anthologize_API_Project extends Anthologize_API_Content
 {
 	/**
 	 * @var  array      All of the projects "parts" (Anthologize_API_Part objects)

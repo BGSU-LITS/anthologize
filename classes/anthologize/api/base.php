@@ -23,17 +23,6 @@ abstract class Anthologize_API_Base implements ArrayAccess
 	public function __construct(array $data)
 	{
 		$this->data = $data;
-		$this->meta = get_post_meta($data['ID'], 'anthologize_meta', true );
-	}
-
-	/**
-	 * The project title
-	 *
-	 * @return string
-	 */
-	public function title()
-	{
-		return $this->get('post_title', "");
 	}
 
 	/**
@@ -44,23 +33,6 @@ abstract class Anthologize_API_Base implements ArrayAccess
 	public function data()
 	{
 		return $this->data;
-	}
-
-	/**
-	 * Gets the metadata array or a property by name.
-	 *
-	 * @param  string   $name     The metadata name to get
-	 * @param  mixed    $default  THe default value (if value not found)
-	 * @return mixed
-	 */
-	public function meta($name = null, $default = null)
-	{
-		if ($name === null)
-		{
-			return $this->meta;
-		}
-
-		return isset($this->meta[$name]) ? $this->meta[$name] : $default;
 	}
 
 	/**
