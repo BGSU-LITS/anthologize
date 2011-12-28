@@ -267,26 +267,43 @@ class Anthologize_Wordpress_Admin {
 	 */
 	public function item_meta_save( $post_id ) {
 		// make sure data came from our meta box. Only save when nonce is present
-		if ( empty( $_POST['anthologize_noncename'] ) || !wp_verify_nonce( $_POST['anthologize_noncename'],__FILE__ ) )
+		if ( empty( $_POST['anthologize_noncename'] ) || !wp_verify_nonce( $_POST['anthologize_noncename'],'anthologize/post/edit' ) )
+		{
 			return $post_id;
-		
-		// Check user permissions.
-		if ( !$this->user_can_edit() ) 
-			return $post_id;
-		
-		if ( empty( $_POST['anthologize_meta'] ) || !$new_data = $_POST['anthologize_meta'] )
-			$new_data = array();
-		
-		if ( !$anthologize_meta = get_post_meta( $post_id, 'anthologize_meta', true ) )
-			$anthologize_meta = array();
-		
-		foreach( $new_data as $key => $value ) {
-			$anthologize_meta[$key] = maybe_unserialize( $value );
 		}
-		
+
+		// Check user permissions.
+		if ( !$this->user_can_edit() )
+		{
+			return $post_id;
+		}
+
+		$new_data = isset($_POST['anthologize_meta']) ? $_POST['anthologize_meta'] : array();
+		$anthologize_meta = get_post_meta( $_POST['post_ID'], 'anthologize_meta', true );
+
+		// The only thing that can change is the author...
+		if (isset($new_data['author_name']) AND $new_data['author_name'] !== $anthologize_meta['author_name'])
+		{
+			$anthologize_meta['author_name'] = maybe_unserialize($new_data['author_name']);
+			$anthologize_meta['author_name_array'] = array($new_data['author_name']);
+
+			// Check to see if the author already exists
+			$user_id = get_user_by('slug', $new_data['author_name']);
+			if ($user_id !== false)
+			{
+				$anthologize['author_id'] = $id->ID;
+			}
+			else
+			{
+				unset($anthologize_meta['author_id']);
+			}
+		}
+
 		update_post_meta( $post_id,'anthologize_meta', $anthologize_meta );
 		update_post_meta( $post_id, 'author_name', $new_data['author_name'] );
-		
+
+		add_filter( 'redirect_post_location', array( $this, 'item_meta_redirect' ) );
+
 		return $post_id;
 	}
 

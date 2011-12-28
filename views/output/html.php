@@ -60,7 +60,6 @@
 				<div class="post-meta">
 					<img class="gravatar" src="<?php echo $post->gravatar_url(); ?>" />
 					<p class="post-author">By <?php echo $post->author(); ?></p>
-					<p class="post-asserted-author">Attributed to: <?php echo $post->asserted_author(); ?></p>
 				</div>
 				<div class="post-content">
 					<?php echo $post->content($do_shortcodes); ?>

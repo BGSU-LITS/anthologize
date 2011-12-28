@@ -57,5 +57,5 @@
 		<?php endif; ?>
 		
 		<input type="hidden" id="menu_order" name="menu_order" value="<?php echo $post->menu_order; ?>">
-		<input class="tags-input" type="hidden" id="anthologize_noncename" name="anthologize_noncename" value="<?php echo wp_create_nonce(__FILE__); ?>" />
+		<input class="tags-input" type="hidden" id="anthologize_noncename" name="anthologize_noncename" value="<?php echo wp_create_nonce('anthologize/post/edit'); ?>" />
         </div>

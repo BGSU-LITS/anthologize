@@ -36,7 +36,13 @@ class Anthologize_API_Post extends Anthologize_API_Content
 	public function __construct(array $data)
 	{
 		parent::__construct($data);
-		$this->author = get_user_by('id', $this->meta('author_id'));
+
+		$author_id = $this->meta('author_id', null);
+
+		if ($author_id !== null)
+		{
+			$this->author = get_user_by('id', $author_id);
+		}
 	}
 
 	/**
@@ -64,17 +70,23 @@ class Anthologize_API_Post extends Anthologize_API_Content
 	 */
 	public function gravatar_url()
 	{
-		return "http://www.gravatar.com/avatar/".md5(strtolower(trim($this->author->user_email)));
+		$attrs = $this->author ?
+			md5(strtolower(trim($this->author->user_email))):
+			"?f=y"; // Force the icon
+
+		return "http://www.gravatar.com/avatar/".$attrs;
 	}
 
 	/**
 	 * Gets the authors name
 	 *
+	 * This function does an author check in case the author has been changed in edit mode.
+	 *
 	 * @return string
 	 */
 	public function author()
 	{
-		return $this->author->display_name;
+		return $this->author ? $this->author->display_name : $this->meta('author_name');
 	}
 
 	/**
