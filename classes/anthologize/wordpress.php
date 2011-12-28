@@ -413,6 +413,7 @@ class Anthologize_Wordpress
 		anthologize_register_format_option( 'pdf', 'break-parts', __( 'Page break before parts?', 'anthologize' ), 'checkbox' );
 
 		anthologize_register_format_option( 'pdf', 'break-items', __( 'Page break before items?', 'anthologize' ), 'checkbox' );
+		anthologize_register_format_option( 'pdf', 'include_comments', __("Include Comments?", 'anthologize'), 'checkbox', 'true', 'include_comments');
 
 		anthologize_register_format_option( 'pdf', 'colophon', __( 'Include Anthologize colophon page?', 'anthologize' ), 'checkbox' );
 
