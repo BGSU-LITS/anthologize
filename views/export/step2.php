@@ -30,7 +30,7 @@
 				<div id="export-format">
 					<h4><?php _e( 'Export Format', 'anthologize' ) ?></h4>
 					<?php foreach( $formats as $name => $fdata ) : ?>
-					<label><input type="radio" name="filetype" value="<?php echo $name ?>"<?php if($name === $filetype) echo 'checked="checked"'; ?> /> <?php echo $fdata['label'] ?></label><br />
+					<label><input type="radio" name="filetype" value="<?php echo $name ?>" /> <?php echo $fdata['label'] ?></label><br />
 					<?php endforeach; ?>
 				</div>
 

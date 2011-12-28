@@ -50,7 +50,6 @@ class Controller_Export extends Controller
 			'action' => "admin.php?page=anthologize/export&action=step2&noheader=true",
 			'dedication' => $meta['dedication'],
 			'acknowledgements' => $meta['acknowledgements'],
-			'filetype' => $meta['filetype'],
 			'formats' => $anthologize_formats,
 		));
 
@@ -100,6 +99,8 @@ class Controller_Export extends Controller
 		unset($_POST['project_id']);
 
 		$api = new Anthologize_API($id, $_POST);
+
+		//$this->reset_metadata($id); // Clears out the uneeded metadata
 		$this->content = $api->render();
 	}
 
@@ -112,21 +113,44 @@ class Controller_Export extends Controller
 	public static function get_metadata($id)
 	{
 		$meta = ($id === false) ? array() : get_post_meta($id, 'anthologize_meta', true );
+		return array_merge(self::default_metadata(), $meta);
+	}
 
-		$defaults = array(
+	/**
+	 * Resets the metadata for a project the project metadata
+	 *
+	 * @param  int  $id   The project id
+	 * @return array 
+	 */
+	protected static function reset_metadata($id)
+	{
+		$meta = ($id === false) ? array() : get_post_meta($id, 'anthologize_meta', true );
+		$reset = array_intersect_key($meta, self::default_metadata());
+
+		update_post_meta($id, 'anthologize_meta', $reset);
+		return $reset;
+	}
+
+	/**
+	 * An array with default metadata
+	 *
+	 * @return  array
+	 */
+	public static function default_metadata()
+	{
+		return array(
 			'cyear' => date("Y"),
-			'cname' => isset($meta['author_name']) ? isset($meta['author_name']) : "",
+			'cname' => "",
 			'ctype' => "cc",
 			'cctype' => "by",
 			'edition' => "",
-			'authors' => isset($meta['author_name']) ? $meta['author_name'] : "",
+			'authors' => "",
 			'dedication' => "",
 			'acknowledgements' => "",
-			'filetype' => 'tei',
-			'do-shortcodes' => 1
+			'post-title' => "",
+			'subtitle' => "",
+			'project_id' => "",
 		);
-
-		return array_merge($defaults, $meta);
 	}
 
 	/**

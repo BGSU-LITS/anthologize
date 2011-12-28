@@ -38,11 +38,9 @@ class Anthologize_API
 
 		$this->project = new Anthologize_API_Project((array) $project[0]);
 
-		// Default to HTML output if nothing set
-		if ( ! isset($options['filetype']))
-		{
-			$options['filetype'] = "html";
-		}
+		// The filetype is supposed to be an option, but it on a different screen,
+		// so it is saved as metadata... so we need to move it over.
+		$options['filetype'] = $this->project->meta('filetype', 'html');
 
 		$this->options = $options;
 	}
