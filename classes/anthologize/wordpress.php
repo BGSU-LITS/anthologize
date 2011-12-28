@@ -459,7 +459,8 @@ class Anthologize_Wordpress
 
 		anthologize_register_format_option( 'html', 'font-size', __( 'Font Size', 'anthologize' ), 'dropdown', $htmlFontSizes, '14pt' );
 
-		anthologize_register_format_option( 'html', 'download', __('Download HTML?', 'anthologize'), 'checkbox', array('Download'=>'download'), 'download');
+		anthologize_register_format_option( 'html', 'download', __('Download HTML?', 'anthologize'), 'checkbox', 'true', 'download');
+		anthologize_register_format_option( 'html', 'include_comments', __("Include Comments?", 'anthologize'), 'checkbox', 'true', 'include_comments');
 
 		// Register TEI. No options for this one
 		anthologize_register_format( 'tei', __( 'Anthologize TEI', 'anthologize' ), WP_PLUGIN_DIR . '/anthologize/templates/tei/base.php' );

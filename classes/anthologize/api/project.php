@@ -47,17 +47,8 @@ class Anthologize_API_Project extends Anthologize_API_Content
 	 */
 	public function anthologizer()
 	{
-		return "Anthologizer";
-	}
-
-	/**
-	 * The asserted author for the project
-	 *
-	 * @return string
-	 */
-	public function asserted_author()
-	{
-		return "Asserted Author";
+		$anthologizer = wp_get_current_user();
+		return $anthologizer->display_name;
 	}
 
 }

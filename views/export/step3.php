@@ -18,7 +18,7 @@
 					<div class="pub-options-title"><?php _e($odata['label']); ?></div>
 
 					<?php if ($odata['type'] === "checkbox"): ?>
-						<input name="<?php echo $oname; ?>" id="<?php echo $oname; ?>" type="checkbox" />
+						<input name="<?php echo $oname; ?>" id="<?php echo $oname; ?>" type="checkbox" value="<?php echo $odata['values']; ?>" />
 					<?php elseif ($odata['type'] === "dropdown"): ?>
 						<select name="<?php echo $oname; ?>">
 						<?php foreach( $odata['values'] as $key => $value ): ?>

@@ -23,6 +23,7 @@ class Anthologize_Output_HTML implements Anthologize_Output
 			'acknowledgements' => $project->meta('acknowledgements', ""),
 			'font_size' => $options['font-size'],
 			'do_shortcodes' => $options['do-shortcodes'] === "1" ? true : false,
+			'display_comments' => isset($options['include_comments']) ? true : false,
 		));
 
 		if (isset($options['download']))
