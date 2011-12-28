@@ -31,7 +31,7 @@
 		<p>Tags</p>
 		<ul>
 		<?php foreach ($post->tags() as $tag): ?>
-			<li><a href=""></a></li>
+			<li><a href="<?php echo get_site_url()."?tag={$tag->slug}"; ?>"><?php echo $tag->name; ?></a></li>
 		<?php endforeach; ?>
 		</ul>
 		<?php endif; ?>
