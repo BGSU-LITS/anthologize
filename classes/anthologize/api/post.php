@@ -49,9 +49,10 @@ class Anthologize_API_Post extends Anthologize_API_Content
 	 * Gets the post content
 	 *
 	 * @param  boolean  $do_shortcodes  Run the Wordpress shortcodes
+	 * @param  boolean  $filter         Run the wordpress content filter?
 	 * @return string                   The content
 	 */
-	public function content($do_shortcodes = true)
+	public function content($do_shortcodes = true, $filter = true)
 	{
 		$content = $this->get('post_content', "");
 
@@ -60,7 +61,7 @@ class Anthologize_API_Post extends Anthologize_API_Content
 			remove_filter('the_content', 'do_shortcode', 11);
 		}
 
-		return apply_filters('the_content', $content);
+		return $filter ? apply_filters('the_content', $content) : $content;
 	}
 
 	/**
