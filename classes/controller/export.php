@@ -29,7 +29,7 @@ class Controller_Export extends Controller
 	 */
 	public function action_post_index()
 	{
-		$this->update($_POST, 2);
+		$this->update($_POST, array('action' => 'step2'));
 	}
 
 	/**
@@ -61,7 +61,10 @@ class Controller_Export extends Controller
 	 */
 	public function action_post_step2()
 	{
-		$this->update($_POST, 3);
+		$filetype = $_POST['filetype'];
+		unset($_POST['filetype']); // Making the filetype an option and not in the metadata
+
+		$this->update($_POST, array('action' => 'step3', 'filetype' => $filetype));
 	}
 
 	/**
@@ -75,8 +78,9 @@ class Controller_Export extends Controller
 
 		$id = $this->param('project_id');
 		$meta = self::get_metadata($id);
+		$filetype = $this->param('filetype', 'html');
 
-		$format = $anthologize_formats[$meta['filetype']];
+		$format = $anthologize_formats[$filetype];
 		$label = $format['label'];
 
 		unset($format['label'], $format['loader-path']);
@@ -86,6 +90,7 @@ class Controller_Export extends Controller
 			'project' => get_post($id),
 			'action' => "admin.php?page=anthologize/export&action=step3&noheader=true",
 			'format' => $format,
+			'filetype' => $filetype,
 			'format_title' => sprintf( __( '%s Publishing Options', 'anthologize' ), $label),
 		));
 	}
@@ -100,7 +105,6 @@ class Controller_Export extends Controller
 
 		$api = new Anthologize_API($id, $_POST);
 
-		//$this->reset_metadata($id); // Clears out the uneeded metadata
 		$this->content = $api->render();
 	}
 
@@ -113,32 +117,8 @@ class Controller_Export extends Controller
 	public static function get_metadata($id)
 	{
 		$meta = ($id === false) ? array() : get_post_meta($id, 'anthologize_meta', true );
-		return array_merge(self::default_metadata(), $meta);
-	}
 
-	/**
-	 * Resets the metadata for a project the project metadata
-	 *
-	 * @param  int  $id   The project id
-	 * @return array 
-	 */
-	protected static function reset_metadata($id)
-	{
-		$meta = ($id === false) ? array() : get_post_meta($id, 'anthologize_meta', true );
-		$reset = array_intersect_key($meta, self::default_metadata());
-
-		update_post_meta($id, 'anthologize_meta', $reset);
-		return $reset;
-	}
-
-	/**
-	 * An array with default metadata
-	 *
-	 * @return  array
-	 */
-	public static function default_metadata()
-	{
-		return array(
+		$default = array(
 			'cyear' => date("Y"),
 			'cname' => "",
 			'ctype' => "cc",
@@ -151,26 +131,26 @@ class Controller_Export extends Controller
 			'subtitle' => "",
 			'project_id' => "",
 		);
+
+		return array_merge($default, $meta);
 	}
 
 	/**
 	 * Updates the metadata for a post.
 	 *
-	 * @param array  $data        Metadata data
-	 * @param int    $step        The step to send the user to (If null, then no redirect)
+	 * @param array  $data     Metadata data
+	 * @param array  $params   Additional query params
 	 */
-	protected function update($data, $step = null)
+	protected function update($data, array $params = array())
 	{
 		$project_id = $_POST['project_id'];
+		$params['project_id'] = $project_id;
 		unset($data['project_id']);
 
 		$meta = array_merge(self::get_metadata($project_id), $data);
 		update_post_meta( $project_id, 'anthologize_meta', $meta );
 
-		if ($step !== null)
-		{
-			Anthologize::redirect("admin.php?page=anthologize/export&action=step{$step}&project_id={$project_id}");
-		}
+		Anthologize::redirect("admin.php?page=anthologize/export&".http_build_query($params));
 	}
 
 	/**

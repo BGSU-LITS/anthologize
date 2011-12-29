@@ -49,6 +49,7 @@
 
 			<div style="clear: both;"> </div>
 			<input type="hidden" name="project_id" value="<?php echo $project_id; ?>" />
+			<input type="hidden" name="filetype" value="<?php echo $filetype; ?>" />
 
 			<div class="anthologize-button" id="export-next"><input type="submit" id="submit" value="<?php _e( 'Export', 'anthologize' ) ?>" /></div>
 
